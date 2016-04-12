@@ -1,0 +1,5 @@
+1. Need to install packages manually.
+
+2. Need to ssh-keygen manually and copy authorized_keys.
+
+3. If static IP needed, need config manually.

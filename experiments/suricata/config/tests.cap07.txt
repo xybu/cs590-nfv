@@ -1,0 +1,3 @@
+# Format:
+# nrepeat COMMAND [ARGS]
+1	./update_trace.sh
