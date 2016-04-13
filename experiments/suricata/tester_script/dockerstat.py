@@ -17,7 +17,7 @@ def poll_stats(container_name, delay_sec, out):
 			for stat in cli.stats(container_name, decode=True):
 				timestamp = ciso8601.parse_datetime(stat['read'])
 				if timestamp - last_timestamp > delta:
-					print(json.dumps(stat))
+					out.write(json.dumps(stat) + '\n')
 					last_timestamp = timestamp
 				# cpu_percent = (data['cpu_stats']['cpu_usage']['total_usage'] - data['precpu_stats']['cpu_usage']['total_usage']) / (data['cpu_stats']['system_cpu_usage'] - data['precpu_stats']['system_cpu_usage']) * len(data['cpu_stats']['cpu_usage']['percpu_usage'])
 		except KeyboardInterrupt:
@@ -31,7 +31,7 @@ def main():
 	parser.add_argument('--out', '-o', nargs='?', type=str, help='Save output to the specified file. If not given, print to stdout.')
 	args = parser.parse_args()
 	# print(args)
-	if not args.out:
+	if args.out is None:
 		poll_stats(args.name, args.delay, sys.stdout)
 	else:
 		with open(args.out, 'w') as f:

@@ -89,22 +89,19 @@ class TestSuricataVm(TestSuricataBase):
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'qemu', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		# Could use virsh-top though.
-		self.suricata_out = open(self.local_tmpdir + '/suricata_vm.out', 'wb')
 		self.suricata_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/' + self.args.vm_name + '.py',
 			self.args.vm_ip, '/tmp/test', self.args.vm_nic, str(self.args.swappiness), str(self.args.interval), '/var/log/suricata'],
-			cwd=self.session_tmpdir, stdout=self.suricata_out, stderr=self.suricata_out, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer, store_pid=True, allow_error=True)
 		self.wait_for_suricata('/var/log/suricata', prepend=['ssh', 'root@' + self.args.vm_ip])
 		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval)
 		self.suricata_proc.send_signal(signal.SIGINT)
 		suricata_result = self.suricata_proc.wait_for_result()
-		del self.suricata_proc
 		log('Suricata VM script returned with value %d.' % suricata_result.return_code)
-		self.suricata_out.close()
-		del self.suricata_out
+		del self.suricata_proc
 		self.sysmon_proc.send_signal(signal.SIGINT)
 		self.psmon_proc.send_signal(signal.SIGINT)
 		self.sysmon_proc.wait_for_result()
@@ -132,8 +129,6 @@ class TestSuricataVm(TestSuricataBase):
 			self.suricata_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'psmon_proc'):
 			self.psmon_proc.send_signal(signal.SIGKILL)
-		if hasattr(self, 'suricata_out'):
-			self.suricata_out.close()
 		self.simple_call(['virsh', 'shutdown', self.args.vm_name])
 		self.destroy_session(self.session_id, self.local_tmpdir, self.session_tmpdir, self.args)
 		self.close()

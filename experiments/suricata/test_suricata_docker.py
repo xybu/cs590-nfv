@@ -33,16 +33,17 @@ class TestSuricataDocker(TestSuricataBase):
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', 'docker', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
-		self.docker_stat_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/dockerstat.py', self.container_name, '--out','docker.json', '--delay', str(self.args.interval)],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['docker', 'run', '-i', '--name', self.container_name, '--cpuset-cpus', self.args.cpuset,
 			'--memory', self.args.memory, '--memory-swappiness', str(self.args.swappiness), '--net=host',
 			'-v', '%s:%s' % (self.session_tmpdir, '/var/log/suricata'), 'xybu:suricata', 'suricata', '-i', dest_nic],
 			stdout=self.suricata_out, stderr=self.suricata_out, encoding='utf-8', store_pid=True, allow_error=True)
+		# Enable this monitor if we really need that much info.
+		#self.docker_stat_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/dockerstat.py', self.container_name, '--out', 'docker.json', '--delay', str(self.args.interval)],
+		#	cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.wait_for_suricata(self.session_tmpdir)
 		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval)
 		self.remove_container()
@@ -51,13 +52,13 @@ class TestSuricataDocker(TestSuricataBase):
 		self.suricata_out.close()
 		del self.suricata_proc
 		del self.suricata_out
-		self.docker_stat_proc.send_signal(signal.SIGINT)
+		#self.docker_stat_proc.send_signal(signal.SIGINT)
 		self.sysmon_proc.send_signal(signal.SIGINT)
 		self.psmon_proc.send_signal(signal.SIGINT)
-		self.docker_stat_proc.wait_for_result()
+		#self.docker_stat_proc.wait_for_result()
 		self.sysmon_proc.wait_for_result()
 		self.psmon_proc.wait_for_result()
-		del self.docker_stat_proc
+		#del self.docker_stat_proc
 		del self.sysmon_proc
 		del self.psmon_proc
 		if self.status == self.STATUS_START:
@@ -75,8 +76,8 @@ class TestSuricataDocker(TestSuricataBase):
 		self.simple_call(['sudo', 'pkill', '-9', 'python'])
 		if hasattr(self, 'sysmon_proc'):
 			self.sysmon_proc.send_signal(signal.SIGKILL)
-		if hasattr(self, 'docker_stat_proc'):
-			self.suricata_proc.send_signal(signal.SIGKILL)
+		#if hasattr(self, 'docker_stat_proc'):
+		#	self.suricata_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'psmon_proc'):
 			self.psmon_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'suricata_out'):

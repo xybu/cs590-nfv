@@ -26,9 +26,9 @@ class TestSuricataBareMetal(TestSuricataBase):
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
+			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['suricata', '-l', self.session_tmpdir, '-i', dest_nic],
 			stdout=self.suricata_out, stderr=self.suricata_out, store_pid=True, allow_error=True)
