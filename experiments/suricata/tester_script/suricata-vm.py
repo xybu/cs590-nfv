@@ -35,12 +35,12 @@ def remake_dir(path):
 	simple_call(['mkdir', '-p', path])
 
 # Adjust swappiness
-simple_call(['sudo', 'sysctl', '-w', 'vm.swappiness', str(vm_swappiness)])
+simple_call(['sudo', 'sysctl', '-w', 'vm.swappiness=' + str(vm_swappiness)])
 simple_call(['sysctl', 'vm.swappiness'])
 
 # Rebuild log dir.
-remake_dir(vm_tmpdir)
-remake_dir(suricata_logdir + '/' + vm_data_dirname)
+remake_dir(vm_tmpdir + '/' + vm_data_dirname)
+remake_dir(suricata_logdir)
 simple_call(['sync'])
 
 # Configure NIC.

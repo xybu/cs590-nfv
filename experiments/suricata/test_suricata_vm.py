@@ -31,10 +31,10 @@ class TestSuricataVm(TestSuricataBase):
 		while True:
 			log('Wait for 10sec to probe VM IP address from DHCP...')
 			time.sleep(10)
-			ret = self.shell.run(['virsh', 'net-dhcp-leases', 'default'],
-				encoding='utf-8', allow_error=True)
-			for line in ret.output:
-				if line.contains(vm_name):
+			ret = self.shell.run(['virsh', 'net-dhcp-leases', 'default'], allow_error=True)
+			for line in ret.output.decode('utf-8').split('\n'):
+				print(line.strip().split())
+				if vm_name in line:
 					# "2016-04-12 01:13:28  52:54:00:fb:44:5b  ipv4      192.168.122.204/24        suricata-vm     -"
 					return line.strip().split()[4].split('/')[0]
 
@@ -90,7 +90,7 @@ class TestSuricataVm(TestSuricataBase):
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'qemu', '--delay', str(self.args.interval), '--out', 'psstat.csv'],
+		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'qemu', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
 		# Could use virsh-top though.
 		self.suricata_out = open(self.local_tmpdir + '/suricata_vm.out', 'wb')
@@ -118,7 +118,7 @@ class TestSuricataVm(TestSuricataBase):
 		log('Postwork...')
 		if self.status == self.STATUS_DONE:
 			self.simple_call(['rsync', '-zvrpE', 'root@%s:%s/*' % (self.args.vm_ip, '/var/log/suricata'), self.session_tmpdir + '/'])
-			self.simple_call(['rsync', '-zvrpE', 'root@%s:%s/*' % (self.args.vm_ip, , '/tmp/test'), self.session_tmpdir + '/'])
+			self.simple_call(['rsync', '-zvrpE', 'root@%s:%s/*' % (self.args.vm_ip, '/tmp/test'), self.session_tmpdir + '/'])
 			self.upload_test_session(self.session_id, self.local_tmpdir, self.session_tmpdir)
 
 	def cleanup(self):
@@ -154,7 +154,7 @@ def main():
 	parser.add_argument('trace', type=str, help='Name of a trace file in trace repository.')
 	parser.add_argument('nworker', type=int, help='Number of concurrent TCPreplay processes.')
 	parser.add_argument('--src-nic', '-s', nargs='?', type=str, default='em2', help='Replay trace on this local NIC.')
-	parser.add_argument('--dest-nic', '-d', nargs='?', type=str, default='em2', help='Trace will be observed on this NIC on the dest host.')
+	parser.add_argument('--dest-nic', '-d', nargs='?', type=str, default='enp34s0', help='Trace will be observed on this NIC on the dest host.')
 	parser.add_argument('--macvtap', '-v', default=False, action='store_true', help='If present, create a macvtap device on dest host.')
 	parser.add_argument('--interval', '-t', nargs='?', type=int, default=4, help='Interval (sec) between collecting dest host info.')
 	parser.add_argument('--vm-name', '-n', nargs='?', type=str, default='suricata-vm', help='Name of the virtual machine registered to libvirt.')

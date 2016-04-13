@@ -18,7 +18,7 @@ class TestSuricataBase:
 
 	def __init__(self):
 		self.status = self.STATUS_INIT
-		# reboot_remote_host(host=RUNNER_HOST, user=RUNNER_USER)
+		reboot_remote_host(host=RUNNER_HOST, user=RUNNER_USER)
 		self.shell = get_remote_shell(host=RUNNER_HOST, user=RUNNER_USER)
 
 	def simple_call(self, cmd):
@@ -26,7 +26,7 @@ class TestSuricataBase:
 
 	def init_test_session(self, session_id, local_tmpdir, session_tmpdir, args):
 		log('Adjusting swappiness of remote host...')
-		self.simple_call(['sudo', 'sysctl', '-w', 'vm.swappiness', str(args.swappiness)])
+		self.simple_call(['sudo', 'sysctl', '-w', 'vm.swappiness=' + str(args.swappiness)])
 		self.simple_call(['sysctl', 'vm.swappiness'])
 		log('Creating local temp dir...')
 		subprocess.call(['mkdir', '-p', local_tmpdir])
@@ -80,7 +80,7 @@ class TestSuricataBase:
 				return
 
 	def replay_trace(self, local_tmpdir, trace_file, nworker, src_nic, poll_interval_sec):
-		monitor_proc = subprocess.Popen([os.getcwd() + '/tester_script/sysmon.py', '--nic', src_nic, '--delay', str(poll_interval_sec)],
+		monitor_proc = subprocess.Popen([os.getcwd() + '/tester_script/sysmon.py', '--nic', src_nic, '--delay', str(poll_interval_sec), '--suffix', '.tcpreplay'],
 			stdout=sys.stdout, stderr=sys.stderr, cwd=local_tmpdir)
 		workers = []
 		with open(local_tmpdir + '/tcpreplay.out', 'wb') as f:
@@ -91,8 +91,8 @@ class TestSuricataBase:
 				log('Waiting for all %d tcpreplay processes to complete...' % nworker)
 				for w in workers:
 					w.wait()
-				log('All tcpreplay processes are complete. Wait for 10sec before proceeding.')
-				time.sleep(10)
+				log('All tcpreplay processes are complete. Wait for 20sec before proceeding.')
+				time.sleep(20)
 			except KeyboardInterrupt as e:
 				log('Interrupted. Stopping tcpreplay processes...')
 				for w in workers:

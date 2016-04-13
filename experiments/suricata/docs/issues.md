@@ -25,3 +25,7 @@
 
  * April 8, 2016 is an awkward time because Ubuntu 16.04 LTS will be released in
  two weeks. This newer version maintains packages of much newer versions.
+
+ * It turns out that the "CPU throttling" we observed is a problem with atop. 
+ Other programs like htop, top, and my own monitor show that the CPU usage of
+ qemu process is indeed 400%.

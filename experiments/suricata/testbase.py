@@ -9,12 +9,11 @@ from helpers import *
 def reboot_remote_host(host, user):
 	log('Rebooting host "%s"...' % host)
 	retval = subprocess.call(['ssh', '%s@%s' % (user, host), 'sudo', 'reboot'])
-	if retval == 0:
-		retval = 1
-		while retval != 0:
-			log('Wait 30sec for remote host "%s" to start...' % host)
-			time.sleep(30)
-			retval = subprocess.call(['ssh', '%s@%s' % (user, host), 'echo', 'Remote host is ready.'])
+	retval = 1
+	while retval != 0:
+		log('Wait 30sec for remote host "%s" to start...' % host)
+		time.sleep(30)
+		retval = subprocess.call(['ssh', '%s@%s' % (user, host), 'echo', 'Remote host is ready.'])
 
 
 def get_remote_shell(host=RUNNER_HOST, user=RUNNER_USER):

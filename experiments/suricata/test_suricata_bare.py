@@ -13,7 +13,7 @@ class TestSuricataBareMetal(TestSuricataBase):
 		self.session_id = 'logs,bm,%d,%s,%d,%s,%s,%d,%d' % (int(time.time()), args.trace, args.nworker, args.src_nic,
 			args.dest_nic + '.vtap' if args.macvtap else args.dest_nic, args.interval, args.swappiness)
 		self.session_tmpdir = RUNNER_TMPDIR + '/' + self.session_id
-		self.local_tmpdir = TESTER_TMPDIR + '/' + session_id
+		self.local_tmpdir = TESTER_TMPDIR + '/' + self.session_id
 
 	def prework(self):
 		self.init_test_session(self.session_id, self.local_tmpdir, self.session_tmpdir, self.args)
@@ -27,7 +27,7 @@ class TestSuricataBareMetal(TestSuricataBase):
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', '--delay', str(self.args.interval), '--out', 'psstat.csv'],
+		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['suricata', '-l', self.session_tmpdir, '-i', dest_nic],

@@ -14,6 +14,7 @@ their children processes.
 """
 
 import argparse
+import os
 import sys
 import time
 
@@ -24,7 +25,7 @@ def stat_proc(proc, stat, visited=set()):
 	""" Recursively stat a process and its children processes. """
 	if proc.pid in visited:
 		return
-	print('Visiting process %d.' % proc.pid)
+	# print('Visiting process %d.' % proc.pid)
 	visited.add(proc.pid)
 	io = proc.io_counters()
 	mem_rss = proc.memory_info().rss
@@ -58,10 +59,11 @@ def poll_stat(keywords, pids, delay_sec, out):
 		'nctxsw': 0,
 		'nthreads': 0
 	}
-	keys = sorted(base_stat.keys())
-	base_timestamp = int(time.time())
 	prev_stat = dict(base_stat)
-	print('Timestamp, Uptime, ' + ', '.join(keys), file=out)
+	keys = sorted(base_stat.keys())
+	out.write('Timestamp, Uptime, ' + ', '.join(keys) + '\n')
+	base_timestamp = int(time.time())
+	last_timestamp = int(time.time())
 	while True:
 		visited = set()
 		curr_stat = dict(base_stat)
@@ -88,7 +90,11 @@ def poll_stat(keywords, pids, delay_sec, out):
 		line += ', '.join([str(curr_stat[k]) for k in keys])
 		out.write(line + '\n')
 		prev_stat = curr_stat
-		time.sleep(delay_sec)
+		d = delay_sec + delay_sec - timestamp + last_timestamp
+		if d <= 0:
+			d = delay_sec >> 1
+		time.sleep(d)
+		last_timestamp = timestamp
 
 
 def main():
@@ -109,6 +115,10 @@ def main():
 		# Convert to lowercase to achieve case Insensitiveness.
 		keywords = [k.lower() for k in args.keywords]
 		args.keywords = keywords
+	try:
+		psutil.Process(os.getpid()).nice(-20)
+	except:
+		print('Error: failed to elevate priority!', file=sys.stderr)
 	try:
 		if args.out is not None:
 			with open(args.out, 'w') as f:

@@ -12,3 +12,4 @@ fi
 # Required for both sender and receiver.
 sudo pip install -U psutil
 sudo pip install -U spur
+sudo pip install -U ciso8601

@@ -34,9 +34,9 @@ class TestSuricataDocker(TestSuricataBase):
 			dest_nic = self.MACVTAP_NAME
 		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', 'docker', '--delay', str(self.args.interval), '--out', 'psstat.csv'],
+		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', 'docker', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
-		self.docker_stat_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/dockerstat.py', self.container_name, 'docker.json', str(self.args.interval)],
+		self.docker_stat_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/dockerstat.py', self.container_name, '--out','docker.json', '--delay', str(self.args.interval)],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['docker', 'run', '-i', '--name', self.container_name, '--cpuset-cpus', self.args.cpuset,
