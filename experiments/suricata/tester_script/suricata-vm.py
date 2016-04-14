@@ -53,9 +53,10 @@ subprocess.call(['rsync', '-zvrpE', script_dir, 'root@%s:%s' % (vm_ip, vm_tmpdir
 # Start monitors. Send SIGINT to this script to stop.
 with open('suricata.out', 'wb') as suricata_out:
 	try:
-		sysmon_p = sh.spawn([vm_tmpdir + '/' + script_dirname + '/sysmon.py', '--nic', vm_nic, '--delay', str(stat_interval), '--suffix', '.vm'],
-			cwd=vm_tmpdir+'/'+vm_data_dirname, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer, store_pid=True, allow_error=True)
-		psmon_p = sh.spawn([vm_tmpdir + '/' + script_dirname + '/psmon.py', '--keywords', 'suricata', '--delay', str(stat_interval), '--out', 'psstat.suricata.csv'],
+		sysmon_p = sh.spawn([vm_tmpdir + '/' + script_dirname + '/sysmon.py',
+			'--delay', str(stat_interval), '--outfile', 'sysstat.vm.csv',
+			'--nic', vm_nic, '--nic-outfile', 'netstat.{nic}.vm.csv',
+			'--enable-ps', '--ps-keywords', 'suricata', '--ps-outfile', 'psstat.suricata.vm.csv'],
 			cwd=vm_tmpdir+'/'+vm_data_dirname, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer, store_pid=True, allow_error=True)
 		suricata_p = sh.spawn(['suricata', '-l', suricata_logdir, '-i', vm_nic],
 			stdout=suricata_out, stderr=suricata_out, store_pid=True, allow_error=True)
@@ -66,6 +67,4 @@ with open('suricata.out', 'wb') as suricata_out:
 		suricata_p.wait_for_result()
 	finally:
 		sysmon_p.send_signal(signal.SIGINT)
-		psmon_p.send_signal(signal.SIGINT)
-		for p in (sysmon_p, psmon_p):
-			p.wait_for_result()
+		sysmon_p.wait_for_result()

@@ -32,9 +32,10 @@ class TestSuricataDocker(TestSuricataBase):
 		if self.args.macvtap:
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
-		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', 'docker', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
+		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py',
+			'--delay', str(self.args.interval), '--outfile', 'sysstat.receiver.csv',
+			'--nic', nic, '--nic-outfile', 'netstat.{nic}.csv',
+			'--enable-ps', '--ps-keywords', 'suricata', 'docker', '--ps-outfile', 'psstat.docker.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['docker', 'run', '-i', '--name', self.container_name, '--cpuset-cpus', self.args.cpuset,
@@ -54,13 +55,10 @@ class TestSuricataDocker(TestSuricataBase):
 		del self.suricata_out
 		#self.docker_stat_proc.send_signal(signal.SIGINT)
 		self.sysmon_proc.send_signal(signal.SIGINT)
-		self.psmon_proc.send_signal(signal.SIGINT)
 		#self.docker_stat_proc.wait_for_result()
 		self.sysmon_proc.wait_for_result()
-		self.psmon_proc.wait_for_result()
 		#del self.docker_stat_proc
 		del self.sysmon_proc
-		del self.psmon_proc
 		if self.status == self.STATUS_START:
 			self.status = self.STATUS_DONE
 
@@ -78,8 +76,6 @@ class TestSuricataDocker(TestSuricataBase):
 			self.sysmon_proc.send_signal(signal.SIGKILL)
 		#if hasattr(self, 'docker_stat_proc'):
 		#	self.suricata_proc.send_signal(signal.SIGKILL)
-		if hasattr(self, 'psmon_proc'):
-			self.psmon_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'suricata_out'):
 			self.suricata_out.close()
 		self.destroy_session(self.session_id, self.local_tmpdir, self.session_tmpdir, self.args)

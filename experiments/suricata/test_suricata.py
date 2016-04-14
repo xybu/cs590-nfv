@@ -80,7 +80,9 @@ class TestSuricataBase:
 				return
 
 	def replay_trace(self, local_tmpdir, trace_file, nworker, src_nic, poll_interval_sec):
-		monitor_proc = subprocess.Popen([os.getcwd() + '/tester_script/sysmon.py', '--nic', src_nic, '--delay', str(poll_interval_sec), '--suffix', '.tcpreplay'],
+		monitor_proc = subprocess.Popen([os.getcwd() + '/tester_script/sysmon.py',
+			'--delay', str(poll_interval_sec), '--outfile', 'sysstat.sender.csv',
+			'--nic', src_nic, '--nic-outfile', 'netstat.tcpreplay.{nic}.csv'],
 			stdout=sys.stdout, stderr=sys.stderr, cwd=local_tmpdir)
 		workers = []
 		with open(local_tmpdir + '/tcpreplay.out', 'wb') as f:
@@ -102,7 +104,6 @@ class TestSuricataBase:
 			finally:
 				monitor_proc.send_signal(signal.SIGINT)
 				monitor_proc.wait()
-				log('Local sysmon.py exited.')
 
 	def start(self):
 		raise NotImplementedError()

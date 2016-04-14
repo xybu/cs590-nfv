@@ -88,9 +88,10 @@ class TestSuricataVm(TestSuricataBase):
 		if self.args.macvtap:
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
-		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'qemu', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
+		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py',
+			'--delay', str(self.args.interval), '--outfile', 'sysstat.receiver.csv',
+			'--nic', nic, '--nic-outfile', 'netstat.{nic}.csv',
+			'--enable-ps', '--ps-keywords', 'qemu', '--ps-outfile', 'psstat.qemu.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		# Could use virsh-top though.
 		self.suricata_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/' + self.args.vm_name + '.py',
@@ -103,11 +104,8 @@ class TestSuricataVm(TestSuricataBase):
 		log('Suricata VM script returned with value %d.' % suricata_result.return_code)
 		del self.suricata_proc
 		self.sysmon_proc.send_signal(signal.SIGINT)
-		self.psmon_proc.send_signal(signal.SIGINT)
 		self.sysmon_proc.wait_for_result()
-		self.psmon_proc.wait_for_result()
 		del self.sysmon_proc
-		del self.psmon_proc
 		if self.status == self.STATUS_START:
 			self.status = self.STATUS_DONE
 
@@ -127,8 +125,6 @@ class TestSuricataVm(TestSuricataBase):
 			self.sysmon_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'docker_stat_proc'):
 			self.suricata_proc.send_signal(signal.SIGKILL)
-		if hasattr(self, 'psmon_proc'):
-			self.psmon_proc.send_signal(signal.SIGKILL)
 		self.simple_call(['virsh', 'shutdown', self.args.vm_name])
 		self.destroy_session(self.session_id, self.local_tmpdir, self.session_tmpdir, self.args)
 		self.close()
@@ -155,7 +151,7 @@ def main():
 	parser.add_argument('--vm-name', '-n', nargs='?', type=str, default='suricata-vm', help='Name of the virtual machine registered to libvirt.')
 	parser.add_argument('--vm-ip', '-i', nargs='?', type=str, default='dhcp', help='IP address of the virtual machine (e.g., "192.168.122.2" or "dhcp").')
 	parser.add_argument('--vm-nic', '-f', nargs='?', type=str, default='eth1', help='Trace will be observed on this NIC in the VM (default: eth1). Must be configured by VM manually.')
-	parser.add_argument('--memory', '-m', nargs='?', type=str, default='2g', help='Memory limit of the virtual machine (e.g., "2g", "512m").')
+	parser.add_argument('--memory', '-m', nargs='?', type=str, default='2g', help='Memory limit of the virtual machine (e.g., "2g", "512m"). Must be integer number followed by "g", "m", or "k".')
 	parser.add_argument('--vcpus', '-p', nargs='?', type=int, default=0, help='Number of vCPUs for the virtual machine (e.g., 0=max).')
 	parser.add_argument('--cpuset', '-c', nargs='?', type=str, default='0-3', help='Set of CPUs the VM can use (e.g., "0-3", "1,3-5").')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness on host and in VM (e.g., 5).')

@@ -77,12 +77,16 @@ def traverse_logdir(path):
 	for dirname in all_logdirs:
 		prefix, engine, ts, trace, nworker, args = dirname.split(',', maxsplit=5)
 		parse_eve(path + '/' + dirname + '/eve.json', engine, ts, trace, nworker, args)
-		parse_netstat(path + '/' + dirname + '/netstat.tcpreplay.em2.csv', engine, ts, trace, nworker, args + ',nicout')
-		parse_netstat(path + '/' + dirname + '/netstat.enp34s0.csv', engine, ts, trace, nworker, args + ',nicin')
+		parse_netstat(path + '/' + dirname + '/netstat.tcpreplay.em2.csv', engine, ts, trace, nworker, args + ',netout')
+		parse_netstat(path + '/' + dirname + '/netstat.enp34s0.csv', engine, ts, trace, nworker, args + ',netin')
 		parse_sysstat(path + '/' + dirname + '/sysstat.receiver.csv', engine, ts, trace, nworker, args + ',receiver')
 		parse_psstat(path + '/' + dirname + '/psstat.suricata.csv', engine, ts, trace, nworker, args)
 		parse_psstat(path + '/' + dirname + '/psstat.docker.csv', engine, ts, trace, nworker, args)
-		parse_psstat(path + '/' + dirname + '/psstat.qemu.csv', engine, ts, trace, nworker, args)
+		if engine == 'vm':
+			parse_psstat(path + '/' + dirname + '/psstat.qemu.csv', engine, ts, trace, nworker, args)
+			parse_sysstat(path + '/' + dirname + '/sysstat.vm.csv', engine, ts, trace, nworker, args + ',vm')
+			parse_psstat(path + '/' + dirname + '/psstat.suricata.vm.csv', engine, ts, trace, nworker, args + ',suricata')
+			parse_netstat(path + '/' + dirname + '/netstat.eth1.vm.csv', engine, ts, trace, nworker, args + ',netin,vm')
 
 
 def main():

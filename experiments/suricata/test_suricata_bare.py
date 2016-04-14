@@ -25,9 +25,10 @@ class TestSuricataBareMetal(TestSuricataBase):
 		if self.args.macvtap:
 			nic = nic + ',' + self.MACVTAP_NAME
 			dest_nic = self.MACVTAP_NAME
-		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py', '--delay', str(self.args.interval), '--nic', nic, '--suffix', '.suricata'],
-			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
-		self.psmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/psmon.py', '--keywords', 'suricata', '--delay', str(self.args.interval), '--out', 'psstat.all.csv'],
+		self.sysmon_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/sysmon.py',
+			'--delay', str(self.args.interval), '--outfile', 'sysstat.receiver.csv',
+			'--nic', nic, '--nic-outfile', 'netstat.{nic}.csv',
+			'--enable-ps', '--ps-keywords', 'suricata', '--ps-outfile', 'psstat.suricata.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
 		self.suricata_proc = self.shell.spawn(['suricata', '-l', self.session_tmpdir, '-i', dest_nic],
@@ -41,11 +42,8 @@ class TestSuricataBareMetal(TestSuricataBase):
 		del self.suricata_proc
 		del self.suricata_out
 		self.sysmon_proc.send_signal(signal.SIGINT)
-		self.psmon_proc.send_signal(signal.SIGINT)
 		self.sysmon_proc.wait_for_result()
-		self.psmon_proc.wait_for_result()
 		del self.sysmon_proc
-		del self.psmon_proc
 		if self.status == self.STATUS_START:
 			self.status = self.STATUS_DONE
 
@@ -59,8 +57,6 @@ class TestSuricataBareMetal(TestSuricataBase):
 		self.simple_call(['sudo', 'pkill', '-9', 'python'])
 		if hasattr(self, 'sysmon_proc'):
 			self.sysmon_proc.send_signal(signal.SIGKILL)
-		if hasattr(self, 'psmon_proc'):
-			self.psmon_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'suricata_proc'):
 			self.suricata_proc.send_signal(signal.SIGKILL)
 		if hasattr(self, 'suricata_out'):
