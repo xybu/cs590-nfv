@@ -11,8 +11,8 @@ import json
 
 import xlsxwriter
 
-import excelhelper
-import exceptions
+from . import excelhelper
+from . import exceptions
 
 
 EVE_STRUCTURE = {
@@ -31,10 +31,6 @@ EVE_STRUCTURE = {
 }
 
 
-def get_collection_name(engine, ts, trace, nworker, args):
-	return ','.join([engine, trace, nworker, args])
-
-
 class EveCollection:
 
 	def __init__(self, name):
@@ -45,7 +41,7 @@ class EveCollection:
 	def get_key(self, engine, ts, trace, nworker, args):
 		return ts
 
-	def add_eve(self, key, data):
+	def add(self, key, data):
 		self.all_data[key] = data
 
 	def to_xlsx(self):
