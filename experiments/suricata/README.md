@@ -1,0 +1,144 @@
+Benchmarking Suricata in Different Isolation Solutions
+======================================================
+
+## Introduction
+
+Containers like LXC are becoming a popular solution to program isolation. Compared to virtual machines, containers tend to have less
+resource overhead and higher performance. In this experiment we explore how much sense it will make moving 
+[Suricata](http://suricata-ids.org/), a popular multi-threaded IDS program, from a virtual machine to a container. We compare
+performance and resource usage of Suricata in bare metal, Docker container, and virtual machine setups, and in different load levels
+and resource allocation configurations.
+
+### Method
+
+Use [tcpreplay](http://tcpreplay.appneta.com/) to replay some Pcap traffic files collected from the Internet, and analyze performance
+of Suricata (running in bare metal, Docker, and VM, respectively) from statistics it reports and resource usage of related processes
+and resource availability of the entire host.
+
+When comparing Docker container and VM, we will also tune the resource limit and see how Suricata will perform.
+
+#### Hardware
+
+We use four servers of the same hardware configuration. They form two pairs of test setups -- (cap03, cap09) and (cap06, cap07). cap03
+and cap06 are hosts to run Suricata, while cap09 and cap07 are hosts to run tcpreplay (which is CPU intensive) and control script.
+The two hosts of each pair are connected directly by an Ethernet cable.
+
+All four machines have the following hardware configuration:
+
+ * CPU: Intel Xeon X3430 @ 2.40GHz CPU ([EIST](https://en.wikipedia.org/wiki/SpeedStep)/C-states disabled; VT-x on, VT-d on)
+ * RAM: 2 x 2 GB of DDR3-1333 RAM
+ * HDD: 500GB Seagate 3.5" 7200RPM + 2 x 1TB Seagate 3.5" 7200RPM
+ * Network: 2 x Broadcom 1Gbps NIC. **em1** (**enp32s0** on cap03/cap06) is used for remote access and management, and **em2**
+ (**enp34s0** on cap03/cap06) is used to transmit the test traffic.
+
+#### Software
+
+##### Sender Host (cap07/cap09)
+
+Senders run Ubuntu Server 14.04.4 64-bit.
+
+|  Package name  | Version |
+| -------------- | ------- |
+| gcc            | 4.8.4   |
+| tcpreplay      | 4.1.1   |
+| python3        | 3.4     |
+| python3-spur   | 0.3.16  |
+| python3-psutil | 4.1.0   |
+
+##### Receiver Host (cap03/cap06)
+
+Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (particularly QEMU, which dates 8 years ago) on Ubuntu
+14.04 are too old; some (libvirt 1.2.2) are even buggy.
+
+|     Package      |    Host    |   Docker  |     VM      |
+|  --------------  |  --------  | --------- |  ---------  |
+|     Docker       |   1.11.0   |     -     |    -        |
+|     libvirt      |   1.3.3    |     -     |    -        |
+|     gcc          |   5.2.1    |   5.2.1   |   5.2.1     |
+|     Suricata     |    3.0.1   |   3.0.1   |    3.0.1    |
+|  Emerging Rules  |   20160414 |  20160414 |   20160414  |
+|  python3         |   3.4      |    -      |   3.4       |
+|  python3-spur    |    0.3.16  |    -      |     -       |
+|  python3-psutil  |  4.1.0     |    -      |     4.1.0   |
+
+###### Side notes
+
+ * To use streamlined test script, host user and sender must be able to run sudo without password prompt
+   (`sudo visudo` and add `username ALL=(ALL) NOPASSWD: ALL`).
+ * Use SSH authorized_keys to facilitate SSH login.
+
+##### Suricata
+
+Suricata loads the free version of [Emerging Rules](http://rules.emergingthreats.net/open/suricata/) as of 2016-04-14.
+
+Unless otherwise noted, Suricata uses default configuration generated when installed to the system.
+
+Suricata 3.0.1, released on April 4, 2016, [fixed many memory leak bugs and improved stability](http://suricata-ids.org/news/).
+This can be confirmed by our previous testing of 3.0 version inside VM setup, which resulted in memory thrashing and can barely
+be tested in any load above moderate.
+
+##### Trace files
+
+We use the following flows available from the Internet:
+
+ * [Sample flows provided by TCPreplay](http://tcpreplay.appneta.com/wiki/captures.html) -- `bigFlows.pcap` (359,457 KB), `smallFlows.pcap` (9,224 KB).
+ * [Sample traces collected by WireShark](https://wiki.wireshark.org/SampleCaptures)
+ * [Publicly available PCAP files](http://www.netresec.com/?page=PcapFiles)
+ * [ISTS'12 trace files](http://www.netresec.com/?page=ISTS) -- randomly picked `snort.log.1425823194` (155,823 KB).
+
+##### Performance Analysis
+
+We analyze the performance of Suricata by comparing speed of packets / bytes captured, speed of packets / bytes decoded, and
+speed of alerts triggered for different setups when playing the same trace with the same number of parallel workers. Theoretically the
+speed of traffic sent is the same, so the difference of those speeds result from the receiver setup.
+
+##### Resource Monitoring
+
+We use a Python script based on Python3 `psutil` package. It periodically polls the system-wide CPU, memory, and Disk I/O usage, and
+optionally the traffic sent / received on specified NIC, and sum of resource usage of a subset of processes (e.g., `docker` processes
+and their children processes) and outputs the information to a CSV file. We compared the numbers with popular system monitor programs
+like `top`, `htop`, `atop` (buggy, discussed later) and can confirm that the numbers are correct and the periods between polls are
+(almost perfectly) constant.
+
+___Why not use `top` or `atop` directly?___
+
+ - Because `top` and `atop` polls more numbers than needed, they incur much higher overhead on the receiver system.
+ - Output is not friendly for post-processing, even after CSV-fied.
+ - Lines of `top` do not contain timestamps; because we start monitors before Suricata, we cannot ask monitors to poll information 
+   of Suricata process (its PID not known beforehand).
+ - `atop` behaves wrong on our system. When running VM setup, `atop` reports 50% of CPU usage each core while in fact they are all
+   100% (confirmed by `htop` and `top`).
+ - Because `atop` and `top` (which needs to monitor several processes like two `docker` processes and one `Suricata-Main` process)
+   are separate processes, their output seldom hits the same timestamp, and thus the sum of the reported numbers is not accurate.
+
+By contrast, our monitor script prints neatly for each polling timestamp all the system-wide resource availability and sum of resource
+usage of the processes we are interested in one CSV line. This makes post-processing easy as well.
+
+##### Testbed Setups
+
+###### Bare metal
+
+In bare metal setting, Suricata will run directly on top of hardware and inspect the NIC that the test traffic enters.
+
+###### Docker container
+
+In this Docker setting, the container is configured so that the network interfaces of the host is exposed to the container, enabling
+Suricata to inspect the same NIC interface as in bare metal setting.
+
+The CPU and RAM limitations can be passed as parameters of the test script. By default, it allows the container to access all 4 cores
+and has a RAM limit of 2GB (1536m and 1g are also tested).
+
+###### Docker + macvtap
+
+In Docker-vtap setting, the difference from Docker setup is that we create a macvtap of model "virtio" and mode "passthrough" to
+mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device.
+
+###### Virtual machine
+
+The virtual machine hardware is configurable. Different CPU and RAM configuration may be passed as parameters of the test script.
+By default, it is configured to have 4 vCPUs each of which has access to all 4 cores of the host CPU. Capacities of vCPU is copied
+from host CPU ("host-model"). RAM is set to 2 GB by default. The XML configurations are available in [`config/`](config/). In terms of
+NIC, We create a macvtap device (macvtap0) of model "virtio" and mode "passthrough" to copy the test traffic arriving at host's
+enp34s0 to VM's eth1. Another NIC, eth0, is added for communications between host and the VM.
+
+The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
