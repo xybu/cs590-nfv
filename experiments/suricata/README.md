@@ -120,7 +120,9 @@ usage of the processes we are interested in one CSV line. This makes post-proces
 
 In bare metal setting, Suricata will run directly on top of hardware and inspect the NIC that the test traffic enters.
 
-###### Docker container
+![Bare metal setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/bare_metal.svg)
+
+###### Docker
 
 In this Docker setting, the container is configured so that the network interfaces of the host is exposed to the container, enabling
 Suricata to inspect the same NIC interface as in bare metal setting.
@@ -128,10 +130,14 @@ Suricata to inspect the same NIC interface as in bare metal setting.
 The CPU and RAM limitations can be passed as parameters of the test script. By default, it allows the container to access all 4 cores
 and has a RAM limit of 2GB (1536m and 1g are also tested).
 
+![Docker setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker.svg)
+
 ###### Docker + macvtap
 
 In Docker-vtap setting, the difference from Docker setup is that we create a macvtap of model "virtio" and mode "passthrough" to
 mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device.
+
+![Docker-vtap setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker_vtap.svg)
 
 ###### Virtual machine
 
@@ -142,3 +148,5 @@ NIC, We create a macvtap device (macvtap0) of model "virtio" and mode "passthrou
 enp34s0 to VM's eth1. Another NIC, eth0, is added for communications between host and the VM.
 
 The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
+
+![Virtual machine setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/vm.svg)
