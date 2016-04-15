@@ -25,8 +25,8 @@ The two hosts of each pair are connected directly by an Ethernet cable.
 
 All four machines have the following hardware configuration:
 
- * CPU: Intel Xeon X3430 @ 2.40GHz CPU ([EIST](https://en.wikipedia.org/wiki/SpeedStep)/C-states disabled; VT-x on, VT-d on)
- * RAM: 2 x 2 GB of DDR3-1333 RAM
+ * CPU: [Intel Xeon X3430 @ 2.40GHz](http://ark.intel.com/products/42927/Intel-Xeon-Processor-X3430-8M-Cache-2_40-GHz) (Nehalem; [EIST](https://en.wikipedia.org/wiki/SpeedStep)/C-states disabled; VT-x on, VT-d on; HT unsupported)
+ * RAM: 2 x 2 GB DDR3-1333 RAM
  * HDD: 500GB Seagate 3.5" 7200RPM + 2 x 1TB Seagate 3.5" 7200RPM
  * Network: 2 x Broadcom 1Gbps NIC. **em1** (**enp32s0** on cap03/cap06) is used for remote access and management, and **em2**
  (**enp34s0** on cap03/cap06) is used to transmit the test traffic.
@@ -85,6 +85,23 @@ We use the following flows available from the Internet:
  * [Sample traces collected by WireShark](https://wiki.wireshark.org/SampleCaptures)
  * [Publicly available PCAP files](http://www.netresec.com/?page=PcapFiles)
  * [ISTS'12 trace files](http://www.netresec.com/?page=ISTS) -- randomly picked `snort.log.1425823194` (155,823 KB).
+
+##### bigFlows.pcap
+
+According to TCPreplay website, bigFlows.pcap has the following characteristics:
+
+ > This is a capture of real network traffic on a busy private network's access point to the Internet. The capture is much larger and
+ > has a smaller average packet size than the previous capture. It also has many more flows and different applications. If the large
+ > size of this file isn't a problem, you may want to select it for your tests.
+ > 
+ > * Size: 368 MB
+ > * Packets: 791615
+ > * Flows: 40686
+ > * Average packet size: 449 bytes
+ > * Duration: 5 minutes
+ > * Number Applications: 132
+
+From the log of Suricata we can confirm that the traffic consists of numerous procotols on various ISO/OSI layers.
 
 #### Performance Analysis
 
