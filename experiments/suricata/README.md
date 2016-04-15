@@ -135,7 +135,7 @@ ___Why not use `top` or `atop` directly?___
 By contrast, our monitor script prints neatly for each polling timestamp all the system-wide resource availability and sum of resource
 usage of the processes we are interested in one CSV line. This makes post-processing easy as well.
 
-__Why examine system-wide resource usage?__
+___Why examine system-wide resource usage?___
 
 Because the sum of resource usage of processes that are directly related may not be comprehensive. For example, the RAM usage of mirroring traffic to macvtap is not in any suricata, docker, or qemu processes.
 
