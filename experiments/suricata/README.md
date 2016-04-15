@@ -1,5 +1,5 @@
-Benchmarking Suricata in Different Isolation Solutions
-======================================================
+Benchmarking Suricata in Different Isolation Systems Using TCPreplay
+====================================================================
 
 ## Introduction
 
@@ -38,7 +38,7 @@ All four machines have the following hardware configuration:
 Senders run Ubuntu Server 14.04.4 64-bit.
 
 |  Package name  | Version |
-| -------------- | ------- |
+|:--------------:|:-------:|
 | gcc            | 4.8.4   |
 | tcpreplay      | 4.1.1   |
 | python3        | 3.4     |
@@ -51,7 +51,7 @@ Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (part
 14.04 are too old; some (libvirt 1.2.2) are even buggy.
 
 |     Package      |    Host    |   Docker  |     VM      |
-|  --------------  |  --------  | --------- |  ---------  |
+|:----------------:|:----------:|:---------:|:-----------:|
 |     Docker       |   1.11.0   |     -     |    -        |
 |     libvirt      |   1.3.3    |     -     |    -        |
 |     gcc          |   5.2.1    |   5.2.1   |   5.2.1     |
@@ -168,7 +168,7 @@ The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
 We have the following tests:
 
 |     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory  | CPU | Swappiness | Other Args              | Sample Size |
-| ------------- | ------------- | ---------------- | --------- | -------- | --- | ---------- | ----------------------- | ----------- |
+|:-------------:|:-------------:|:----------------:|:---------:|:--------:|:---:|:----------:|:-----------------------:|:-----------:|
 |   Bare metal  | bigFlows.pcap |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
 |     Docker    | bigFlows.pcap |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
