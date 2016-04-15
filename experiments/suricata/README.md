@@ -121,6 +121,8 @@ like `top`, `htop`, `atop` (buggy, discussed later) and can confirm that the num
 
 Resource monitor polls stats every 4 seconds.
 
+The source code of resource monitor is hosted in [`tester_script/`](tester_script/) directory.
+
 ___Why not use `top` or `atop` directly?___
 
  - Because `top` and `atop` polls more numbers than needed, they incur much higher overhead on the receiver system.
@@ -211,6 +213,8 @@ We have the following tests:
 
 We ran each test multiple times to generate a number of instances (as the sample size column above reflects), and use the median of all
 instances at each stat point to obtain an average result of the test. We then compare the average result of each tests.
+
+The script to parse raw CSV / Suricata eve.json files is hosted in [`dataparser/`](dataparser/) directory.
 
 ## Result
 
