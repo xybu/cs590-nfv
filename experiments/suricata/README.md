@@ -92,6 +92,8 @@ We analyze the performance of Suricata by comparing speed of packets / bytes cap
 speed of alerts triggered for different setups when playing the same trace with the same number of parallel workers. Theoretically the
 speed of traffic sent is the same, so the difference of those speeds result from the receiver setup.
 
+Suricata generates stats every 8 seconds (default value).
+
 #### Resource Monitoring
 
 We use a Python script based on Python3 `psutil` package. It periodically polls the system-wide CPU, memory, and Disk I/O usage, and
@@ -99,6 +101,8 @@ optionally the traffic sent / received on specified NIC, and sum of resource usa
 and their children processes) and outputs the information to a CSV file. We compared the numbers with popular system monitor programs
 like `top`, `htop`, `atop` (buggy, discussed later) and can confirm that the numbers are correct and the periods between polls are
 (almost perfectly) constant.
+
+Resource monitor polls stats every 4 seconds.
 
 ___Why not use `top` or `atop` directly?___
 
@@ -114,7 +118,13 @@ ___Why not use `top` or `atop` directly?___
 By contrast, our monitor script prints neatly for each polling timestamp all the system-wide resource availability and sum of resource
 usage of the processes we are interested in one CSV line. This makes post-processing easy as well.
 
-### Testbed Setups
+__Why examine system-wide resource usage?__
+
+Because the sum of resource usage of processes that are directly related may not be comprehensive. For example, the RAM usage of mirroring traffic to macvtap is not in any suricata, docker, or qemu processes.
+
+System-wide numbers could over-count, but as we are comparing the difference, which results from different setups of Suricata, the over-counted part doesn't matter.
+
+### Test Setups
 
 #### Bare metal
 
@@ -135,7 +145,7 @@ and has a RAM limit of 2GB (1536m and 1g are also tested).
 #### Docker + macvtap
 
 In Docker-vtap setting, the difference from Docker setup is that we create a macvtap of model "virtio" and mode "passthrough" to
-mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device.
+mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device. This is an "intermediate" setup between Docker setup and VM setup, because the cost of running macvtap is unavoidable in VM setup.
 
 ![Docker-vtap setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker_vtap.svg)
 
@@ -152,6 +162,38 @@ The exact hardware configuration will be mentioned when comparing results.
 The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
 
 ![Virtual machine setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/vm.svg)
+
+### Test cases
+
+We have the following tests:
+
+|     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory  | CPU | Swappiness | Other Args              | Sample Size |
+| ------------- | ------------- | ---------------- | --------- | -------- | --- | ---------- | ----------------------- | ----------- |
+|   Bare metal  | bigFlows.pcap |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | bigFlows.pcap |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | bigFlows.pcap |       2          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | bigFlows.pcap |       2          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | bigFlows.pcap |       4          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | bigFlows.pcap |       4          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | bigFlows.pcap |       8          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | bigFlows.pcap |       8          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|     Docker    | bigFlows.pcap |       4          |     No    | 1536 MB  |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | vCPUs=4                 |      ?      |
+|     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
+|       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
+
+We ran each test multiple times to generate a number of instances (as the sample size column above reflects), and use the median of all
+instances at each stat point to obtain an average result of the test. We then compare the average result of each tests.
 
 ## Result
 
