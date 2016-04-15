@@ -9,7 +9,7 @@ resource overhead and higher performance. In this experiment we explore how much
 performance and resource usage of Suricata in bare metal, Docker container, and virtual machine setups, and in different load levels
 and resource allocation configurations.
 
-### Method
+## Method
 
 Use [tcpreplay](http://tcpreplay.appneta.com/) to replay some Pcap traffic files collected from the Internet, and analyze performance
 of Suricata (running in bare metal, Docker, and VM, respectively) from statistics it reports and resource usage of related processes
@@ -17,7 +17,7 @@ and resource availability of the entire host.
 
 When comparing Docker container and VM, we will also tune the resource limit and see how Suricata will perform.
 
-#### Hardware
+### Hardware
 
 We use four servers of the same hardware configuration. They form two pairs of test setups -- (cap03, cap09) and (cap06, cap07). cap03
 and cap06 are hosts to run Suricata, while cap09 and cap07 are hosts to run tcpreplay (which is CPU intensive) and control script.
@@ -31,9 +31,9 @@ All four machines have the following hardware configuration:
  * Network: 2 x Broadcom 1Gbps NIC. **em1** (**enp32s0** on cap03/cap06) is used for remote access and management, and **em2**
  (**enp34s0** on cap03/cap06) is used to transmit the test traffic.
 
-#### Software
+### Software
 
-##### Sender Host (cap07/cap09)
+#### Sender Host (cap07/cap09)
 
 Senders run Ubuntu Server 14.04.4 64-bit.
 
@@ -45,7 +45,7 @@ Senders run Ubuntu Server 14.04.4 64-bit.
 | python3-spur   | 0.3.16  |
 | python3-psutil | 4.1.0   |
 
-##### Receiver Host (cap03/cap06)
+#### Receiver Host (cap03/cap06)
 
 Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (particularly QEMU, which dates 8 years ago) on Ubuntu
 14.04 are too old; some (libvirt 1.2.2) are even buggy.
@@ -61,13 +61,13 @@ Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (part
 |  python3-spur    |    0.3.16  |    -      |     -       |
 |  python3-psutil  |  4.1.0     |    -      |     4.1.0   |
 
-###### Side notes
+##### Side notes
 
  * To use streamlined test script, host user and sender must be able to run sudo without password prompt
    (`sudo visudo` and add `username ALL=(ALL) NOPASSWD: ALL`).
  * Use SSH authorized_keys to facilitate SSH login.
 
-##### Suricata
+#### Suricata
 
 Suricata loads the free version of [Emerging Rules](http://rules.emergingthreats.net/open/suricata/) as of 2016-04-14.
 
@@ -77,7 +77,7 @@ Suricata 3.0.1, released on April 4, 2016, [fixed many memory leak bugs and impr
 This can be confirmed by our previous testing of 3.0 version inside VM setup, which resulted in memory thrashing and can barely
 be tested in any load above moderate.
 
-##### Trace files
+#### Trace files
 
 We use the following flows available from the Internet:
 
@@ -86,13 +86,13 @@ We use the following flows available from the Internet:
  * [Publicly available PCAP files](http://www.netresec.com/?page=PcapFiles)
  * [ISTS'12 trace files](http://www.netresec.com/?page=ISTS) -- randomly picked `snort.log.1425823194` (155,823 KB).
 
-##### Performance Analysis
+#### Performance Analysis
 
 We analyze the performance of Suricata by comparing speed of packets / bytes captured, speed of packets / bytes decoded, and
 speed of alerts triggered for different setups when playing the same trace with the same number of parallel workers. Theoretically the
 speed of traffic sent is the same, so the difference of those speeds result from the receiver setup.
 
-##### Resource Monitoring
+#### Resource Monitoring
 
 We use a Python script based on Python3 `psutil` package. It periodically polls the system-wide CPU, memory, and Disk I/O usage, and
 optionally the traffic sent / received on specified NIC, and sum of resource usage of a subset of processes (e.g., `docker` processes
@@ -114,15 +114,15 @@ ___Why not use `top` or `atop` directly?___
 By contrast, our monitor script prints neatly for each polling timestamp all the system-wide resource availability and sum of resource
 usage of the processes we are interested in one CSV line. This makes post-processing easy as well.
 
-##### Testbed Setups
+### Testbed Setups
 
-###### Bare metal
+#### Bare metal
 
 In bare metal setting, Suricata will run directly on top of hardware and inspect the NIC that the test traffic enters.
 
 ![Bare metal setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/bare_metal.svg)
 
-###### Docker
+#### Docker
 
 In this Docker setting, the container is configured so that the network interfaces of the host is exposed to the container, enabling
 Suricata to inspect the same NIC interface as in bare metal setting.
@@ -132,21 +132,26 @@ and has a RAM limit of 2GB (1536m and 1g are also tested).
 
 ![Docker setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker.svg)
 
-###### Docker + macvtap
+#### Docker + macvtap
 
 In Docker-vtap setting, the difference from Docker setup is that we create a macvtap of model "virtio" and mode "passthrough" to
 mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device.
 
 ![Docker-vtap setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker_vtap.svg)
 
-###### Virtual machine
+#### Virtual machine
 
-The virtual machine hardware is configurable. Different CPU and RAM configuration may be passed as parameters of the test script.
-By default, it is configured to have 4 vCPUs each of which has access to all 4 cores of the host CPU. Capacities of vCPU is copied
-from host CPU ("host-model"). RAM is set to 2 GB by default. The XML configurations are available in [`config/`](config/). In terms of
-NIC, We create a macvtap device (macvtap0) of model "virtio" and mode "passthrough" to copy the test traffic arriving at host's
-enp34s0 to VM's eth1. Another NIC, eth0, is added for communications between host and the VM.
+The virtual machine hardware is configurable. Default configurations are available in XML format in
+[`config/`](config/). Different CPU and RAM configuration may be passed as parameters of the test script.
+By default, it has 4 vCPUs each of which has access to all 4 cores of the host CPU. Capacities of vCPU are copied from host CPU
+("host-model"). RAM is set to 2 GB. In terms of NIC, We create a macvtap device (macvtap0) of model "virtio" and mode "passthrough" to
+copy the test traffic arriving at host's enp34s0 to VM's eth1. Another NIC, eth0, is added for communications between host and the VM.
+
+The exact hardware configuration will be mentioned when comparing results.
 
 The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
 
 ![Virtual machine setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/vm.svg)
+
+## Result
+
