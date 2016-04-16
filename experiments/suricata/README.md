@@ -61,6 +61,8 @@ Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (part
 |  python3-spur    |    0.3.16  |    -      |     -       |
 |  python3-psutil  |  4.1.0     |    -      |     4.1.0   |
 
+The VM resembles software of host system, running Ubuntu Server 15.10 64-bit and making sure all critical packages are of the same version as the host.
+
 ##### Side notes
 
  * To use streamlined test script, host user and sender must be able to run sudo without password prompt
@@ -102,6 +104,8 @@ According to TCPreplay website, bigFlows.pcap has the following characteristics:
  > * Number Applications: 132
 
 From the log of Suricata we can confirm that the traffic consists of numerous procotols on various ISO/OSI layers.
+
+The peak throughput of the trace is approximately 2.13 MBps (diagram will given later), so our Ethernet link will support about 50 parallel TCPreplay processes.
 
 #### Performance Analysis
 
@@ -210,6 +214,10 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
+|     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
+| Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
+|     Docker    | bigFlows.pcap |       32         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
+| Docker + vtap | bigFlows.pcap |       32         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 
 We ran each test multiple times to generate a number of instances (as the sample size column above reflects), and use the median of all
 instances at each stat point to obtain an average result of the test. We then compare the average result of each tests.
