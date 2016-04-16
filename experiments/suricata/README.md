@@ -105,7 +105,10 @@ According to TCPreplay website, bigFlows.pcap has the following characteristics:
 
 From the log of Suricata we can confirm that the traffic consists of numerous procotols on various ISO/OSI layers.
 
-The peak throughput of the trace is approximately 2.13 MBps (diagram will given later), so our Ethernet link will support about 50 parallel TCPreplay processes. However, CPU of the sender host saturates at 4 concurrent TCPreplay processes; it takes longer for all TCPreplay processes to finish above that concurrency level.
+The peak throughput of the trace is approximately 2.13 MBps (diagram will given later), so our Ethernet link will support about 50
+parallel TCPreplay processes. However, CPU of the sender host saturates at 4 concurrent TCPreplay processes; it takes longer for all
+TCPreplay processes to finish replaying above that concurrency level. For this reason, test results above concurrency level 4 are not
+comparable to those equal to or below that level. Results not in the same concurrency level above 4 are not cross-comparable either.
 
 #### Performance Analysis
 
