@@ -208,15 +208,16 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       8          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | bigFlows.pcap |       16         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
+|     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
+| Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
+|       VM      | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |   Planned   |
 |     Docker    | bigFlows.pcap |       4          |     No    | 1536 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | vCPUs=4                 |      ?      |
 |     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       16         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
-| Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 |   Bare metal  | bigFlows.pcap |       32         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
 |     Docker    | bigFlows.pcap |       32         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
 | Docker + vtap | bigFlows.pcap |       32         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
@@ -224,8 +225,9 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       48         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
 | Docker + vtap | bigFlows.pcap |       48         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 
-We ran each test multiple times to generate a number of samples (as shown the sample size column), and use the median of all
-samples at each stat point to obtain an average result of the test. We then compare the average results of tests. Before running every test, the receiver host is rebooted to make sure system state is restored back to original.
+We ran each test multiple times to generate a number of samples (as shown the sample size column). Before running every test, the
+receiver host is rebooted to make sure system state is restored back to original. After all samples are generated, we use the median of
+all samples at each checkpoint to obtain an average result of the test. We then compare the average results of tests.
 
 The script to parse raw CSV / Suricata eve.json files is hosted in [`dataparser/`](dataparser/) directory.
 
