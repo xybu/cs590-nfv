@@ -61,7 +61,7 @@ Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (part
 |  python3-spur    |    0.3.16  |    -      |     -       |
 |  python3-psutil  |  4.1.0     |    -      |     4.1.0   |
 
-The VM resembles software of host system, running Ubuntu Server 15.10 64-bit and making sure all critical packages are of the same version as the host.
+The docker image and VM try to resemble software of host system, running Ubuntu Server 15.10 64-bit and making sure all critical packages are of the same version as the host.
 
 ##### Side notes
 
@@ -105,10 +105,12 @@ According to TCPreplay website, bigFlows.pcap has the following characteristics:
 
 From the log of Suricata we can confirm that the traffic consists of numerous procotols on various ISO/OSI layers.
 
-The peak throughput of the trace is approximately 2.13 MBps (diagram will given later), so our Ethernet link will support about 50
-parallel TCPreplay processes. However, CPU of the sender host saturates at 4 concurrent TCPreplay processes; it takes longer for all
-TCPreplay processes to finish replaying above that concurrency level. For this reason, test results above concurrency level 4 are not
-comparable to those equal to or below that level. Results not in the same concurrency level above 4 are not cross-comparable either.
+The peak throughput of the trace is approximately 2.13 MBps (diagram will given later), so our Ethernet link will support less than 50
+concurrent TCPreplay processes. However, CPU of the sender host saturates at 4 concurrent TCPreplay processes; it takes longer for all
+TCPreplay processes to finish replaying above that concurrency level (e.g., peak throughput less than doubles at concurrency level 16
+compared to concurrency level 4, because at level 16 it can take 3X more time to finish). For this reason, test results above
+concurrency level 4 are not comparable to those equal to or below that level. Results not in the same concurrency level above 4 are not
+cross-comparable either.
 
 #### Performance Analysis
 
@@ -215,18 +217,15 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
 | Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 |       VM      | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |   Planned   |
+|   Bare metal  | bigFlows.pcap |       32         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
+|     Docker    | bigFlows.pcap |       32         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
+| Docker + vtap | bigFlows.pcap |       32         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 |     Docker    | bigFlows.pcap |       4          |     No    | 1536 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | vCPUs=4                 |      ?      |
 |     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       32         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       32         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
-| Docker + vtap | bigFlows.pcap |       32         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
-|   Bare metal  | bigFlows.pcap |       48         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       48         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
-| Docker + vtap | bigFlows.pcap |       48         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
 
 We ran each test multiple times to generate a number of samples (as shown the sample size column). Before running every test, the
 receiver host is rebooted to make sure system state is restored back to original. After all samples are generated, we use the median of
