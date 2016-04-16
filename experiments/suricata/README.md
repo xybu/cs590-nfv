@@ -195,7 +195,7 @@ The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
 
 We have the following tests:
 
-|     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory  | CPU | Swappiness | Other Args              | Sample Size |
+|     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory* | CPU | Swappiness | Other Args              | Sample Size |
 |:-------------:|:-------------:|:----------------:|:---------:|:--------:|:---:|:----------:|:-----------------------:|:-----------:|
 |   Bare metal  | bigFlows.pcap |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
 |     Docker    | bigFlows.pcap |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
@@ -226,6 +226,9 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
+
+* *From the perspective of physical host, neither Docker nor QEMU strictly enforces this memory limit. The actual memory usage can go
+  slightly higher.
 
 We ran each test multiple times to generate a number of samples (as shown the sample size column). Before running every test, the
 receiver host is rebooted to make sure system state is restored back to original. After all samples are generated, we use the median of
