@@ -22,67 +22,10 @@
 5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
 5 ./test_suricata_vm.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
 
-5 ./test_suricata_bare.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 768m -c 0-3
+10 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 768m -c 0-3 -v
+10 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 768m -p 4 -c 0-3 -w 5
 
-5 ./test_suricata_bare.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-5 ./test_suricata_bare.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
-5 ./test_suricata_docker.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
-5 ./test_suricata_vm.py bigFlows.pcap 8 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 0-3 -w 5
-
-20 ./test_suricata_bare.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5
-20 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 1g -c 0-3
-20 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 1g -c 0-3 -v
-20 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 1g -p 4 -c 0-3 -w 5
+10 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 1,3
+10 ./test_suricata_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 1,3 -v
+10 ./test_suricata_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n suricata-vm -m 2g -p 4 -c 1,3 -w 5
