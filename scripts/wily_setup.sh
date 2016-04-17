@@ -9,7 +9,7 @@ sudo apt-get -y install ack-grep build-essential cmake automake gcc g++ valgrind
 
 alias vi=vim
 
-# No sudo password prompt.
+# No sudo password prompt. Should change username.
 sudo bash -c 'echo -e "\nbu1 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
 
 # Configure Mercurial.
@@ -28,11 +28,11 @@ sudo ssh-keygen
 sudo cp -r /home/bu1/.ssh /root/
 
 # Mount extra hard disks.
-sudo bash -c 'echo "/dev/sdb1	/scratch				  ext4    nodev,nosuid,acl        1       2" >> /etc/fstab'
-sudo bash -c 'echo "/dev/sdc1	/scratch2				  ext4    nodev,nosuid,acl        1       2" >> /etc/fstab'
+sudo bash -c 'echo -e "/dev/sdb1\t/scratch\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
+sudo bash -c 'echo -e "/dev/sdc1\t/scratch2\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
 
 # Configure swappiness.
-sudo bash -c 'echo "vm.swappiness = 5" >> /etc/sysctl.conf'
+sudo bash -c 'echo -e "vm.swappiness = 5" >> /etc/sysctl.conf'
 
 # Configure em2.
 sudo bash -c 'echo "" >> /etc/network/interfaces'
@@ -49,8 +49,8 @@ curl -fsSL https://get.docker.com/ | sh
 sudo usermod -aG docker $USER
 
 # Fix cgroup issue.
-sudo bash -c 'sed "s/GRUB_TIMEOUT=[0-9]*/GRUB_TIMEOUT=0/" /etc/default/grub > /etc/default/grub'
-sudo bash -c 'sed "s/GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapaccount=1\"/" /etc/default/grub > /etc/default/grub'
+sed "s/GRUB_TIMEOUT=[0-9]*/GRUB_TIMEOUT=0/" /etc/default/grub | tee /tmp/grub
+sed "s/GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapaccount=1\"/" /tmp/grub | sudo tee /etc/default/grub
 sudo update-grub
 
 # Install QEMU/KVM.
