@@ -236,5 +236,9 @@ all samples at each checkpoint to obtain an average result of the test. We then 
 
 The script to parse raw CSV / Suricata eve.json files is hosted in [`dataparser/`](dataparser/) directory.
 
+Note: after a test is run, all generated log files will be transferred to server cap08 using `rsync`. There are occasional glitches on
+public network which could cause failure (connection timeout) of transmission. This is the reason why the sample size of some tests are
+slightly smaller. I don't know why the clusters become inaccessible during those minutes.
+
 ## Result
 
