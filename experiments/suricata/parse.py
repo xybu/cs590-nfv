@@ -98,6 +98,7 @@ def traverse_logdir(path):
 	with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS * 2) as executor:
 		for dirname in all_logdirs:
 			prefix, engine, ts, trace, nworker, args = dirname.split(',', maxsplit=5)
+			args = args.replace(',1024m,', ',1g,', 1)
 			parent_path = path + '/' + dirname
 			execute(all_futures, executor, parse_eve, parent_path + '/eve.json', engine, ts, trace, nworker, args)
 			execute(all_futures, executor, parse_sysstat, parent_path + '/sysstat.sender.csv', engine, ts, trace, nworker, args + ',sender')
