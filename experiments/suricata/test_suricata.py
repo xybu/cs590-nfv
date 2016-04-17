@@ -79,7 +79,7 @@ class TestSuricataBase:
 				log('Suricata is ready.')
 				return
 
-	def replay_trace(self, local_tmpdir, trace_file, nworker, src_nic, poll_interval_sec):
+	def replay_trace(self, local_tmpdir, trace_file, nworker, src_nic, poll_interval_sec, replay_speed_X):
 		monitor_proc = subprocess.Popen([os.getcwd() + '/tester_script/sysmon.py',
 			'--delay', str(poll_interval_sec), '--outfile', 'sysstat.sender.csv',
 			'--nic', src_nic, '--nic-outfile', 'netstat.tcpreplay.{nic}.csv'],
@@ -87,9 +87,11 @@ class TestSuricataBase:
 		workers = []
 		with open(local_tmpdir + '/tcpreplay.out', 'wb') as f:
 			try:
+				cmd = ['sudo', 'tcpreplay', '-i', src_nic, LOCAL_TRACE_REPO_DIR + '/' + trace_file]
+				if replay_speed_X != 1:
+					cmd += ['--multiplier', str(replay_speed_X)]
 				for i in range(nworker):
-					workers.append(subprocess.Popen(['sudo', 'tcpreplay', '-i', src_nic, LOCAL_TRACE_REPO_DIR + '/' + trace_file],
-						stdout=f, stderr=f))
+					workers.append(subprocess.Popen(cmd, stdout=f, stderr=f))
 				log('Waiting for all %d tcpreplay processes to complete...' % nworker)
 				for w in workers:
 					w.wait()
