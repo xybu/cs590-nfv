@@ -10,8 +10,8 @@ class TestSuricataBareMetal(TestSuricataBase):
 	def __init__(self, args):
 		super().__init__()
 		self.args = args
-		self.session_id = 'logs,bm,%d,%s,%d,%s,%s,%d,%d' % (int(time.time()), args.trace, args.nworker, args.src_nic,
-			args.dest_nic + '.vtap' if args.macvtap else args.dest_nic, args.interval, args.swappiness)
+		self.session_id = 'logs,bm,%d,%s,%d,%s,%s,%d,%d,%d' % (int(time.time()), args.trace, args.nworker, args.src_nic,
+			args.dest_nic + '.vtap' if args.macvtap else args.dest_nic, args.interval, args.swappiness, args.replay_speed)
 		self.session_tmpdir = RUNNER_TMPDIR + '/' + self.session_id
 		self.local_tmpdir = TESTER_TMPDIR + '/' + self.session_id
 
@@ -34,7 +34,7 @@ class TestSuricataBareMetal(TestSuricataBase):
 		self.suricata_proc = self.shell.spawn(['suricata', '-l', self.session_tmpdir, '-i', dest_nic],
 			stdout=self.suricata_out, stderr=self.suricata_out, store_pid=True, allow_error=True)
 		self.wait_for_suricata(self.session_tmpdir)
-		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval)
+		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval, self.args.replay_speed)
 		self.suricata_proc.send_signal(signal.SIGTERM)
 		suricata_result = self.suricata_proc.wait_for_result()
 		log('Suricata returned with value %d.' % suricata_result.return_code)
@@ -84,6 +84,7 @@ def main():
 	parser.add_argument('--macvtap', '-v', default=False, action='store_true', help='If present, create a macvtap device on dest host.')
 	parser.add_argument('--interval', '-t', nargs='?', type=int, default=4, help='Interval (sec) between collecting dest host info.')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness of the host (e.g., 5).')
+	parser.add_argument('--replay-speed', '-m', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
 	args = parser.parse_args()
 	log(str(args))
 	TestSuricataBareMetal(args).start()
