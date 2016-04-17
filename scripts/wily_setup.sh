@@ -23,9 +23,9 @@ git config --global user.email "xybu92@live.com"
 git config --global core.editor vim
 
 # Copy ssh key.
-rsync -zrvpE bu1@cap07:/home/bu1/.ssh ~/
-sudo ssh-keygen
-sudo cp -r /home/bu1/.ssh /root/
+rsync -zrvpE bu1@cap08:/home/bu1/.ssh ~/
+sudo mkdir -p /root/.ssh
+sudo cp /home/bu1/.ssh/* /root/.ssh/
 
 # Mount extra hard disks.
 sudo bash -c 'echo -e "/dev/sdb1\t/scratch\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
