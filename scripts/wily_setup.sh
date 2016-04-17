@@ -23,6 +23,8 @@ git config --global user.name "Xiangyu Bu"
 git config --global user.email "xybu92@live.com"
 git config --global core.editor vim
 
+echo "colorscheme elflord" >> ~/.vimrc
+
 # Copy ssh key.
 rsync -zrvpE bu1@cap07:/home/bu1/.ssh ~/
 sudo ssh-keygen
