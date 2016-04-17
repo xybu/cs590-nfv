@@ -11,8 +11,8 @@ class TestSuricataDocker(TestSuricataBase):
 		super().__init__()
 		self.container_name = container_name
 		self.args = args
-		self.session_id = 'logs,docker,%d,%s,%d,%s,%s,%d,%s,%s,%d' % (int(time.time()), args.trace, args.nworker, args.src_nic,
-			args.dest_nic + '.vtap' if args.macvtap else args.dest_nic, args.interval, args.memory, args.cpuset, args.swappiness)
+		self.session_id = 'logs,docker,%d,%s,%d,%s,%s,%d,%s,%s,%d,%d' % (int(time.time()), args.trace, args.nworker, args.src_nic,
+			args.dest_nic + '.vtap' if args.macvtap else args.dest_nic, args.interval, args.memory, args.cpuset, args.swappiness, args.replay_speed)
 		self.session_tmpdir = RUNNER_TMPDIR + '/' + self.session_id
 		self.local_tmpdir = TESTER_TMPDIR + '/' + self.session_id
 
@@ -46,7 +46,7 @@ class TestSuricataDocker(TestSuricataBase):
 		#self.docker_stat_proc = self.shell.spawn([RUNNER_TMPDIR + '/tester_script/dockerstat.py', self.container_name, '--out', 'docker.json', '--delay', str(self.args.interval)],
 		#	cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
 		self.wait_for_suricata(self.session_tmpdir)
-		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval)
+		self.replay_trace(self.local_tmpdir, self.args.trace, self.args.nworker, self.args.src_nic, self.args.interval, self.args.replay_speed)
 		self.remove_container()
 		suricata_result = self.suricata_proc.wait_for_result()
 		log('Suricata container returned with value %d.' % suricata_result.return_code)
@@ -103,6 +103,7 @@ def main():
 	parser.add_argument('--memory', '-m', nargs='?', type=str, default='2g', help='Memory limit of the Docker container (e.g., "2g", "512m").')
 	parser.add_argument('--cpuset', '-c', nargs='?', type=str, default='0-3', help='Set of CPUs the container can use (e.g., "0-3", "1,3-5").')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness of the container (e.g., 5).')
+	parser.add_argument('--replay-speed', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
 	args = parser.parse_args()
 	log(str(args))
 	TestSuricataDocker(args).start()

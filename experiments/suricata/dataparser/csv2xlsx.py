@@ -5,6 +5,7 @@ Parser of a generic csv.
 """
 
 import csv
+import threading
 
 import xlsxwriter
 
@@ -15,6 +16,7 @@ from . import exceptions
 class BaseCsvCollection:
 	
 	def __init__(self, name, suffix):
+		self._lock = threading.Lock()
 		self.name = name
 		self.suffix = suffix
 		self.all_data = dict()
@@ -24,10 +26,13 @@ class BaseCsvCollection:
 		return ts
 
 	def add(self, key, data):
+		self._lock.acquire()
 		self.all_data[key] = data
+		self._lock.release()
 
 	def to_xlsx(self):
 		with open('%s,%s.log' % (self.name, self.suffix), 'w') as f:
+			print('Sample size: %d' % len(self.all_data), file=f)
 			workbook = xlsxwriter.Workbook('%s,%s.xlsx' % (self.name, self.suffix), {'strings_to_numbers': True})
 			summary_sheet = workbook.add_worksheet('Summary')
 			sheet_names = []

@@ -226,6 +226,18 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | snort.log.1425823194 |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | snort.log.1425823194 |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | snort.log.1425823194 |       2          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | snort.log.1425823194 |       2          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|   Bare metal  | snort.log.1425823194 |       4          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
+|     Docker    | snort.log.1425823194 |       4          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
+| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
+|       VM      | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
 
 * *From the perspective of physical host, neither Docker nor QEMU strictly enforces this memory limit. The actual memory usage can go
   slightly higher.
