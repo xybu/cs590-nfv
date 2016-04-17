@@ -84,7 +84,7 @@ def main():
 	parser.add_argument('--macvtap', '-v', default=False, action='store_true', help='If present, create a macvtap device on dest host.')
 	parser.add_argument('--interval', '-t', nargs='?', type=int, default=4, help='Interval (sec) between collecting dest host info.')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness of the host (e.g., 5).')
-	parser.add_argument('--replay-speed', '-m', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
+	parser.add_argument('--replay-speed', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
 	args = parser.parse_args()
 	log(str(args))
 	TestSuricataBareMetal(args).start()
