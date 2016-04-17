@@ -8,6 +8,7 @@ increases as the file progresses.
 """
 
 import json
+import threading
 
 import xlsxwriter
 
@@ -34,6 +35,7 @@ EVE_STRUCTURE = {
 class EveCollection:
 
 	def __init__(self, name):
+		self._lock = threading.Lock()
 		self.name = name
 		self.all_data = dict()
 		print('Created new eve collection: "%s"' % name)
@@ -42,7 +44,9 @@ class EveCollection:
 		return ts
 
 	def add(self, key, data):
+		self._lock.acquire()
 		self.all_data[key] = data
+		self._lock.release()
 
 	def to_xlsx(self):
 		# TODO: Parse this from STRUCTURE.
@@ -50,6 +54,7 @@ class EveCollection:
 		max_rowcount = 0
 		max_colcount = len(sheet_header)
 		with open('%s,eve.log' % self.name, 'w') as f:
+			print('Sample size: %d' % len(self.all_data), file=f)
 			workbook = xlsxwriter.Workbook('%s,eve.xlsx' % self.name, {'strings_to_numbers': True})
 			summary_sheet = workbook.add_worksheet('Summary')
 			sheet_names = []
