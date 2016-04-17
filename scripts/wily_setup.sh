@@ -10,8 +10,7 @@ sudo apt-get -y install ack-grep build-essential cmake automake gcc g++ valgrind
 alias vi=vim
 
 # No sudo password prompt.
-MY_USERNAME=$USER
-sudo bash -c 'echo "$MY_USERNAME ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
+sudo bash -c 'echo -e "\nbu1 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
 
 # Configure Mercurial.
 echo "[ui]" > ~/.hgrc
