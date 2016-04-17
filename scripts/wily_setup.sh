@@ -17,6 +17,9 @@ echo "[ui]" > ~/.hgrc
 echo "username = Xiangyu Bu <xybu92@live.com>" >> ~/.hgrc
 echo "verbose = True" >> ~/.hgrc
 
+# Configure VIM.
+echo "colorscheme elflord" >> ~/.vimrc
+
 # Configure Git.
 git config --global user.name "Xiangyu Bu"
 git config --global user.email "xybu92@live.com"
