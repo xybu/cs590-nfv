@@ -112,6 +112,14 @@ compared to concurrency level 4, because at level 16 it can take 3X more time to
 concurrency level 4 are not comparable to those equal to or below that level. Results not in the same concurrency level above 4 are not
 cross-comparable either.
 
+##### snort.log.1425823194
+
+This trace file requires much higher processing speed than `bigFlows.pcap`.
+
+ > Rated: 6928500.0 Bps, 55.42 Mbps, 6264.04 pps
+ > Flows: 1833 flows, 80.74 fps, 140196 flow packets, 2006 non-flow
+ > Duration: ~22 seconds
+
 #### Performance Analysis
 
 We analyze the performance of Suricata by comparing speed of packets / bytes captured, speed of packets / bytes decoded, and
