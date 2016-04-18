@@ -116,9 +116,9 @@ cross-comparable either.
 
 This trace file requires much higher processing speed than `bigFlows.pcap`.
 
- > Rated: 6928500.0 Bps, 55.42 Mbps, 6264.04 pps
- > Flows: 1833 flows, 80.74 fps, 140196 flow packets, 2006 non-flow
- > Duration: ~22 seconds
+ > * Rated: 6928500.0 Bps, 55.42 Mbps, 6264.04 pps
+ > * Flows: 1833 flows, 80.74 fps, 140196 flow packets, 2006 non-flow
+ > * Duration: ~22 seconds
 
 #### Performance Analysis
 
