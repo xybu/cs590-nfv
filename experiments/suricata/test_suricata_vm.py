@@ -155,7 +155,7 @@ def main():
 	parser.add_argument('--vcpus', '-p', nargs='?', type=int, default=0, help='Number of vCPUs for the virtual machine (e.g., 0=max).')
 	parser.add_argument('--cpuset', '-c', nargs='?', type=str, default='0-3', help='Set of CPUs the VM can use (e.g., "0-3", "1,3-5").')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness on host and in VM (e.g., 5).')
-	parser.add_argument('--replay-speed', '-m', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
+	parser.add_argument('--replay-speed', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
 	args = parser.parse_args()
 	log(str(args))
 	TestSuricataVm(args).start()
