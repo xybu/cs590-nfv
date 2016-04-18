@@ -41,6 +41,7 @@ class TestSuricataBase:
 		# self.simple_call(['sudo', 'pkill', '-9', 'atop'])
 		# Configure NIC to fit Suricata's need.
 		log('Configuring src and dest NICs...')
+		self.simple_call(['sudo', 'ifconfig', args.dest_nic, 'promisc'])
 		for optarg in self.ETHTOOL_ARGS:
 			subprocess.call(['sudo', 'ethtool', '-K', args.src_nic, optarg, 'off'])
 			self.simple_call(['sudo', 'ethtool', '-K', args.dest_nic, optarg, 'off'])
