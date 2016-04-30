@@ -53,7 +53,7 @@ Receivers run Ubuntu Server 15.10 64-bit. The reason is that many packages (part
 |     Package      |    Host    |   Docker  |     VM      |
 |:----------------:|:----------:|:---------:|:-----------:|
 |     Docker       |   1.11.0   |     -     |    -        |
-|     libvirt      |   1.3.3    |     -     |    -        |
+|     libvirt      |   1.2.16    |     -     |    -        |
 |     gcc          |   5.2.1    |   5.2.1   |   5.2.1     |
 |     Suricata     |    3.0.1   |   3.0.1   |    3.0.1    |
 |  Emerging Rules  |   20160414 |  20160414 |   20160414  |
@@ -203,52 +203,64 @@ The virtual disk has size of 64 GiB, large enough to hold logs of GB magnitude.
 
 We have the following tests:
 
-|     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory* | CPU | Swappiness | Other Args              | Sample Size |
-|:-------------:|:-------------:|:----------------:|:---------:|:--------:|:---:|:----------:|:-----------------------:|:-----------:|
-|   Bare metal  | bigFlows.pcap |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | bigFlows.pcap |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       2          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | bigFlows.pcap |       2          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       4          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | bigFlows.pcap |       4          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       8          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | bigFlows.pcap |       8          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | bigFlows.pcap |       16         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
-| Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
-|       VM      | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |   Planned   |
-|   Bare metal  | bigFlows.pcap |       32         |     No    |   4 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       32         |     No    |   2 GB   |  4  |     5      | -                       |   Planned   |
-| Docker + vtap | bigFlows.pcap |       32         |    Yes    |   2 GB   |  4  |     5      | -                       |   Planned   |
-|     Docker    | bigFlows.pcap |       4          |     No    | 1536 MB  |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       4          |    Yes    | 1536 MB  |  4  |     5      | vCPUs=4                 |      ?      |
-|     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                       |      ?      |
-| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                       |      ?      |
-|       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | snort.log.1425823194 |       1          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | snort.log.1425823194 |       1          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | snort.log.1425823194 |       2          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | snort.log.1425823194 |       2          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
-|   Bare metal  | snort.log.1425823194 |       4          |     No    |   4 GB   |  4  |     5      | -                       |      ?      |
-|     Docker    | snort.log.1425823194 |       4          |     No    |   2 GB   |  4  |     5      | -                       |      ?      |
-| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | -                       |      ?      |
-|       VM      | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4                 |      ?      |
+|     Setup     | Trace file    | Para. TCPreplays | Use VTAP? |  Memory* | CPU | Swappiness | Other Args           | Sample Size |
+|:-------------:|:-------------:|:----------------:|:---------:|:--------:|:---:|:----------:|:--------------------:|:-----------:|
+|   Bare metal  | bigFlows.pcap |       1          |     No    |   4 GB   |  4  |     5      | -                    |     40      |
+|     Docker    | bigFlows.pcap |       1          |     No    |   2 GB   |  4  |     5      | -                    |     40      |
+| Docker + vtap | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | -                    |     40      |
+|       VM      | bigFlows.pcap |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     40      |
+|   Bare metal  | bigFlows.pcap |       2          |     No    |   4 GB   |  4  |     5      | -                    |     40      |
+|     Docker    | bigFlows.pcap |       2          |     No    |   2 GB   |  4  |     5      | -                    |     40      |
+| Docker + vtap | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | -                    |     40      |
+|       VM      | bigFlows.pcap |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     40      |
+|   Bare metal  | bigFlows.pcap |       3          |     No    |   4 GB   |  4  |     5      | -                    |     40      |
+|     Docker    | bigFlows.pcap |       3          |     No    |   2 GB   |  4  |     5      | -                    |     40      |
+| Docker + vtap | bigFlows.pcap |       3          |    Yes    |   2 GB   |  4  |     5      | -                    |     40      |
+|       VM      | bigFlows.pcap |       3          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     40      |
+|   Bare metal  | bigFlows.pcap |       4          |     No    |   4 GB   |  4  |     5      | -                    |     40      |
+|     Docker    | bigFlows.pcap |       4          |     No    |   2 GB   |  4  |     5      | -                    |     40      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | -                    |     40      |
+|       VM      | bigFlows.pcap |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     40      |
+|   Bare metal  | bigFlows.pcap |       8          |     No    |   4 GB   |  4  |     5      | -                    |     30      |
+|     Docker    | bigFlows.pcap |       8          |     No    |   2 GB   |  4  |     5      | -                    |     25      |
+| Docker + vtap | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | -                    |     25      |
+|       VM      | bigFlows.pcap |       8          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     30      |
+|   Bare metal  | bigFlows.pcap |       16         |     No    |   4 GB   |  4  |     5      | -                    |     10      |
+|     Docker    | bigFlows.pcap |       16         |     No    |   2 GB   |  4  |     5      | -                    |     10      |
+| Docker + vtap | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | -                    |     10      |
+|       VM      | bigFlows.pcap |       16         |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |     10      |
+|     Docker    | bigFlows.pcap |       4          |     No    | 1024 MB  |  4  |     5      | -                    |     30      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | -                    |     30      |
+|       VM      | bigFlows.pcap |       4          |    Yes    | 1024 MB  |  4  |     5      | vCPUs=4              |     40      |
+|     Docker    | bigFlows.pcap |       4          |     No    | 512 MB   |  4  |     5      | -                    |     10      |
+| Docker + vtap | bigFlows.pcap |       4          |    Yes    | 512 MB   |  4  |     5      | -                    |     10      |
+|       VM      | bigFlows.pcap |       4          |    Yes    | 512 MB   |  4  |     5      | vCPUs=4              |     30      |
+|   Bare metal  | snort.log.1425823194 |       1          |     No    |   4 GB   |  4  |     5      | -                    |      40     |
+|     Docker    | snort.log.1425823194 |       1          |     No    |   2 GB   |  4  |     5      | -                    |      40     |
+| Docker + vtap | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | -                    |      40     |
+|       VM      | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      40     |
+|   Bare metal  | snort.log.1425823194 |       2          |     No    |   4 GB   |  4  |     5      | -                    |      80     |
+|     Docker    | snort.log.1425823194 |       2          |     No    |   2 GB   |  4  |     5      | -                    |      80     |
+| Docker + vtap | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | -                    |      80     |
+|       VM      | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      80     |
+|   Bare metal  | snort.log.1425823194 |       4          |     No    |   4 GB   |  4  |     5      | -                    |     120     |
+|     Docker    | snort.log.1425823194 |       4          |     No    |   2 GB   |  4  |     5      | -                    |      80     |
+| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | -                    |      80     |
+|       VM      | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      80     |
+|     Docker    | snort.log.1425823194 |       4          |     No    |  1024 MB |  4  |     5      | -                    |      43     |
+| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |  1024 MB |  4  |     5      | -                    |      43     |
+|       VM      | snort.log.1425823194 |       4          |    Yes    |  1024 MB |  4  |     5      | vCPUs=4              |      43     |
 
-* *From the perspective of physical host, neither Docker nor QEMU strictly enforces this memory limit. The actual memory usage can go
-  slightly higher.
+Notes
+
+ * From the perspective of physical host, neither Docker nor QEMU strictly enforces this memory limit. The actual memory usage can go
+   slightly higher.
+
+ * For some test setups, the variation is so low that it's not worth repeating many times. For some tests the variation is high and more 
+   rounds are run to get satisfiably large sample.
+
+ * The number of CPU cores is not manipulated because we can gain insight from different load levels. Actually CPU is the bottleneck for most
+   test setups.
 
 We ran each test multiple times to generate a number of samples (as shown the sample size column). Before running every test, the
 receiver host is rebooted to make sure system state is restored back to original. After all samples are generated, we use the median of
