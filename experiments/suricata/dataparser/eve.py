@@ -107,10 +107,11 @@ class EveParser:
 		data = dict()
 		with open(eve_path, 'r') as f:
 			for line in f:
-				ev = json.loads(line)
-				if ev['event_type'] == 'stats':
-					key, val = self.parse_stat(ev['stats'])
-					data[key] = val
+				if 'stats' in line:
+					ev = json.loads(line)
+					if ev['event_type'] == 'stats':
+						key, val = self.parse_stat(ev['stats'])
+						data[key] = val
 		if len(data) == 0:
 			raise exceptions.NoContentException('File "%s" has no stat record.' % eve_path)
 		return data

@@ -15,7 +15,7 @@ from dataparser import mon
 from dataparser import exceptions
 
 
-DATA_VALUT_DIR = "/scratch/bu1/suricataV4"
+DATA_VALUT_DIR = "/scratch/bu1/suricataAll"
 
 evecollections = dict()
 netstatcollections = dict()
@@ -30,12 +30,21 @@ psstatparser = mon.PsStatParser()
 NUM_WORKERS = multiprocessing.cpu_count() 
 
 
-def get_all_logdirs(path):
-	all_logdirs = sorted([i for i in os.listdir(path) if i.startswith('logs')])
+def get_all_logdirs(path, depth=2):
+	if depth == 1:
+		print('Adding all "logs.*"" dirs under "%s".' % path)
+		return sorted([path + '/' + i for i in os.listdir(path) if i.startswith('logs') and os.path.isdir(path + '/' + i)])
+	all_logdirs = []
+	for name in os.listdir(path):
+		if os.path.isdir(path + '/' + name):
+			all_logdirs += get_all_logdirs(path + '/' + name, depth=depth-1)
 	return all_logdirs
 
 
 _collection_lock = threading.Lock()
+
+_task_count_lock = threading.Lock()
+task_count = dict()
 
 
 def get_collection(collections, name, default_class):
@@ -54,7 +63,14 @@ def get_collection_name(engine, ts, trace, nworker, args):
 
 def _parse_csvstat(collections, cls, parser, path, engine, ts, trace, nworker, args):
 	if os.path.isfile(path):
-		print('Processing "%s"...' % path)
+		thname = threading.current_thread().name
+		if thname not in task_count:
+			_task_count_lock.acquire()
+			task_count[thname] = 1
+			_task_count_lock.release()
+		else:
+			task_count[thname] += 1
+		print('\033[93m[%s]\033[0m Start "%s" (%d).' % (thname, path, task_count[thname]))
 		name = get_collection_name(engine, ts, trace, nworker, args)
 		col = get_collection(collections, name, cls)
 		try:
@@ -63,6 +79,7 @@ def _parse_csvstat(collections, cls, parser, path, engine, ts, trace, nworker, a
 			col.add(id, data)
 		except exceptions.NoContentException as ex:
 			print('Error: ' + str(ex))
+		print('\033[92m[%s]\033[0m Done "%s" (%d).' % (thname, path, task_count[thname]))
 
 
 def parse_netstat(path, engine, ts, trace, nworker, args):
@@ -86,34 +103,36 @@ def parse_eve(path, engine, ts, trace, nworker, args):
 
 
 def execute(all_futures, executor, func, *args):
+	print('\033[94m[%s]\033[0m Adding Task %d - "%s"...' % (threading.current_thread().name, len(all_futures), args[0]))
 	all_futures.add(executor.submit(func, *args))
 
 
-def traverse_logdir(path):
+def traverse_logdir(path, scan_depth):
 	num_successes = 0
 	errors = []
-	all_logdirs = get_all_logdirs(path)
+	all_logdirs = get_all_logdirs(path, scan_depth)
 	all_futures = set()
-	print('INFO: using %d concurrent workers to parse %d log dirs.' % (NUM_WORKERS, len(all_logdirs)))
+	print('INFO: using %d concurrent workers to parse %d log dirs.' % (NUM_WORKERS * 2, len(all_logdirs)))
 	with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS * 2) as executor:
-		for dirname in all_logdirs:
+		for dirpath in all_logdirs:
+			parent, dirname = os.path.split(dirpath)
 			prefix, engine, ts, trace, nworker, args = dirname.split(',', maxsplit=5)
 			args = args.replace(',1024m,', ',1g,', 1)
-			parent_path = path + '/' + dirname
-			execute(all_futures, executor, parse_eve, parent_path + '/eve.json', engine, ts, trace, nworker, args)
-			execute(all_futures, executor, parse_sysstat, parent_path + '/sysstat.sender.csv', engine, ts, trace, nworker, args + ',sender')
-			execute(all_futures, executor, parse_netstat, parent_path + '/netstat.tcpreplay.em2.csv', engine, ts, trace, nworker, args + ',netout')
-			execute(all_futures, executor, parse_netstat, parent_path + '/netstat.enp34s0.csv', engine, ts, trace, nworker, args + ',netin')
-			execute(all_futures, executor, parse_sysstat, parent_path + '/sysstat.receiver.csv', engine, ts, trace, nworker, args + ',receiver')
+			execute(all_futures, executor, parse_eve, dirpath + '/eve.json', engine, ts, trace, nworker, args)
+			execute(all_futures, executor, parse_sysstat, dirpath + '/sysstat.sender.csv', engine, ts, trace, nworker, args + ',sender')
+			execute(all_futures, executor, parse_netstat, dirpath + '/netstat.tcpreplay.em2.csv', engine, ts, trace, nworker, args + ',netout')
+			execute(all_futures, executor, parse_netstat, dirpath + '/netstat.enp34s0.csv', engine, ts, trace, nworker, args + ',netin')
+			execute(all_futures, executor, parse_sysstat, dirpath + '/sysstat.receiver.csv', engine, ts, trace, nworker, args + ',receiver')
 			if prefix == 'bm':
-				execute(all_futures, executor, parse_psstat, parent_path + '/psstat.suricata.csv', engine, ts, trace, nworker, args)
+				execute(all_futures, executor, parse_psstat, dirpath + '/psstat.suricata.csv', engine, ts, trace, nworker, args)
 			elif prefix == 'docker':
-				execute(all_futures, executor, parse_psstat, parent_path + '/psstat.docker.csv', engine, ts, trace, nworker, args)
+				execute(all_futures, executor, parse_psstat, dirpath + '/psstat.docker.csv', engine, ts, trace, nworker, args)
 			elif engine == 'vm':
-				execute(all_futures, executor, parse_psstat, parent_path + '/psstat.qemu.csv', engine, ts, trace, nworker, args)
-				execute(all_futures, executor, parse_sysstat, parent_path + '/sysstat.vm.csv', engine, ts, trace, nworker, args + ',vm')
-				execute(all_futures, executor, parse_psstat, parent_path + '/psstat.suricata.vm.csv', engine, ts, trace, nworker, args + ',vm,suricata')
-				execute(all_futures, executor, parse_netstat, parent_path + '/netstat.eth1.vm.csv', engine, ts, trace, nworker, args + ',vm,netin')
+				execute(all_futures, executor, parse_psstat, dirpath + '/psstat.qemu.csv', engine, ts, trace, nworker, args)
+				execute(all_futures, executor, parse_sysstat, dirpath + '/sysstat.vm.csv', engine, ts, trace, nworker, args + ',vm')
+				execute(all_futures, executor, parse_psstat, dirpath + '/psstat.suricata.vm.csv', engine, ts, trace, nworker, args + ',vm,suricata')
+				execute(all_futures, executor, parse_netstat, dirpath + '/netstat.eth1.vm.csv', engine, ts, trace, nworker, args + ',vm,netin')
+		print('\033[94m[%s]\033[0m \033[92mWaiting for all tasks to complete.\033[0m' % threading.current_thread().name)
 		for future in concurrent.futures.as_completed(all_futures):
 			try:
 				future.result()
@@ -131,13 +150,30 @@ def traverse_logdir(path):
 
 
 def main():
+	data_dir = sys.argv[1]
+	output_dir = sys.argv[2]
+	scan_depth = int(sys.argv[3])
 	try:
-		os.mkdir('data')
-		os.chdir('data')
-		print(os.getcwd())
-	except:
-		pass
-	traverse_logdir(DATA_VALUT_DIR)
+		os.makedirs(output_dir)
+		output_dir = os.path.abspath(output_dir)
+	except OSError as e:
+		if e.errno != 17:
+			print('Error: cannot create output path "%s": %s.' % (output_dir, str(e)))
+			return 1
+		else:
+			output_dir = os.path.abspath(output_dir)
+	try:
+		os.chdir(data_dir)
+	except Exception as e:
+		print('Error: cannot chdir to path "%s": %s.' % (data_dir, str(e)))
+		return 1		
+	
+	traverse_logdir('.', scan_depth)
+
+	try:
+		os.chdir(output_dir)
+	except Exception as e:
+		print('Error: cannot chdir to path "%s": %s. Use pwd ("%s") instead.' % (output_dir, str(e), os.getcwd()))
 	with concurrent.futures.ThreadPoolExecutor(max_workers=NUM_WORKERS * 2) as executor:
 		futures = set()
 		for col in (evecollections, netstatcollections, sysstatcollections, psstatcollections):
@@ -149,6 +185,8 @@ def main():
 			except Exception as e:
 				print(Colors.RED + 'Error: %s' % e + Colors.ENDC)
 				print(traceback.format_exc())
+	
+	os.system("grep -r 'Sample size' | sort | tee 'sample_size.txt'")
 
 
 if __name__ == '__main__':
