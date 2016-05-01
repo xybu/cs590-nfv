@@ -338,4 +338,5 @@ We see that increasing the load level barely increases the host memory usage on 
 
 Note that even though after 150 seconds the memory usage of 2X, 3X, 4X load levels is about the same for VM setups, for those load levels, it's the host CPU that is a bottleneck. This prevents Suricata from increasing speed and taking more memory, and also explains why the memory usage there slightly decreases as load increases -- CPU is saturated and the system needs more CPU time to handle the network traffic, making Suricata run with even less resource. It's still noteworthy that for VM setup when CPU is not a bottleneck, the host observes an up to 15% memory usage increase. I therefore conjecture that if CPU were not a bottleneck, the memory usage will go spectacularly higher.
 
-In terms of overhead, while the bare metal consumes about 10% of CPU usage, Docker setups impose trivial memory head, whereas the VM setup can eat three times as much, resulting in a up to 200% overhead.
+In terms of overhead, while the bare metal consumes about 10% of CPU usage, Docker setups impose trivial memory head, whereas the VM setup can eat three times as much, resulting in a up to 250% overhead when busy and 300% over when idle.
+
