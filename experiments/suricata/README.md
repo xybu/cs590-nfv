@@ -257,7 +257,8 @@ Notes
    slightly higher.
 
  * For some test setups, the variation is so low that it's not worth repeating many times. For some tests the variation is high and more 
-   rounds are run to get satisfiably large sample.
+   rounds are run to get satisfiably large sample. Some tests were run significantly more times because the test scripts were copied and
+   pasted.
 
  * The number of CPU cores is not manipulated because we can gain insight from different load levels. Actually CPU is the bottleneck for most
    test setups.
@@ -273,4 +274,5 @@ public network which could cause failure (connection timeout) of transmission. T
 slightly smaller. I don't know why the clusters become inaccessible during those minutes.
 
 ## Result
+
 
