@@ -429,6 +429,84 @@ We see that Suricata inside 512MB VM is struggling to make slow progress, while 
 
 From result of other test configurations, we see that Docker setup is on a par with bare metal in terms of both resource usage and performance, up to 32X load level, beyond which we did not test since the sender host would be overly saturated.
 
+#### Why is Suricata in VM that slow?
+
+To further investigate how Suricata consumes way more CPU in VM than in bare metal, we use
+[oprofile](http://oprofile.sourceforge.net/) to profile the execution of Suricata with 4X load in bare metal and in VM, respectively.
+The result is hosted in [`oprofile_data/`](oprofile_data/) directory.
+
+The function calls that consume most of (aggregated) CPU time on host execution are:
+
+```
+samples  %        linenr info                 app name                 symbol name
+3079940  48.7275  util-cpu.c:190              suricata                 UtilCpuGetTicks
+889800   14.0775  util-mpm-ac.c:1307          suricata                 SCACSearch
+573918    9.0799  detect.c:1237               suricata                 SigMatchSignatures
+```
+
+While the function calls that consume most of CPU time on VM execution are:
+
+```
+samples  %        linenr info                 app name                 symbol name
+3876496  77.4428  util-cpu.c:190              suricata                 UtilCpuGetTicks
+378915    7.5698  detect.c:1237               suricata                 SigMatchSignatures
+144521    2.8872  util-mpm-ac.c:1307          suricata                 SCACSearch
+78725     1.5727  util-profiling.c:994        suricata                 SCProfileRuleStart
+```
+
+We see that the function `UtilCpuGetTicks()` consumes about 48.73% of CPU time of Suricata process on bare metal whereas it consumes
+77.44% in KVM. With detailed report from oprofile we see that it is the seven processing threads that rely heavily on this function,
+whereas the four management threads do not.
+
+We then wonder which instruction in this function takes most time. Assembly wise, on host
+
+```
+0000000000736ca0 <UtilCpuGetTicks>: /* UtilCpuGetTicks total: 3079940 48.7275 */
+ 19614  0.3103 :  736ca0:	push   %rbx
+  1345  0.0213 :  736ca1:	xor    %eax,%eax
+               :  736ca3:	cpuid  
+1281367 20.2724 :  736ca5:	rdtsc  
+391861  6.1996 :  736ca7:	mov    %edx,%edi
+    20 3.2e-04 :  736ca9:	mov    %eax,%esi
+               :  736cab:	xor    %eax,%eax
+               :  736cad:	cpuid  
+1300635 20.5772 :  736caf:	mov    %rdi,%rax
+ 33929  0.5368 :  736cb2:	pop    %rbx
+ 51165  0.8095 :  736cb3:	shl    $0x20,%rax
+     4 6.3e-05 :  736cb7:	or     %rsi,%rax
+               :  736cba:	retq   
+               :  736cbb:	nopl   0x0(%rax,%rax,1)
+```
+
+while in KVM
+
+```
+0000000000736ca0 <UtilCpuGetTicks>: /* UtilCpuGetTicks total: 3876496 77.4428 */
+  3201  0.0639 :  736ca0:	push   %rbx
+   421  0.0084 :  736ca1:	xor    %eax,%eax
+     1 2.0e-05 :  736ca3:	cpuid  
+1760507 35.1706 :  736ca5:	rdtsc  
+159997  3.1963 :  736ca7:	mov    %edx,%edi
+     5 1.0e-04 :  736ca9:	mov    %eax,%esi
+               :  736cab:	xor    %eax,%eax
+  2477  0.0495 :  736cad:	cpuid  
+1783625 35.6324 :  736caf:	mov    %rdi,%rax
+110918  2.2159 :  736cb2:	pop    %rbx
+ 55341  1.1056 :  736cb3:	shl    $0x20,%rax
+     3 6.0e-05 :  736cb7:	or     %rsi,%rax
+               :  736cba:	retq   
+               :  736cbb:	nopl   0x0(%rax,%rax,1)
+```
+
+We find that it takes significantly more (aggregated) time to read x86 Timestamp Counter (TSC) register as the instruction `rdtsc`
+shows, and to move register value from `%rdi` to `%rax`.
+
+Unfortunately we fail to obtain a callgraph from oprofile which could let us know the reason why it spends more time on those
+instructions -- is it simply due to the fact that those instructions run slow in VM? Or is it more caused by more frequent calls to
+this function?
+
+// TODO: Investigate this.
+
 #### Summary
 
 We see that Docker incurs trivial resource overhead compared to bare metal, while KVM's overhead is order of magnitude more than what Suricata itself uses. In terms of performance, while Docker imposes negligible, if any, penalty, KVM makes it much less efficient to run Suricata's instructions and makes CPU a bottleneck at relatively low load levels.
