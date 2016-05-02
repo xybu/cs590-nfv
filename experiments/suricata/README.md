@@ -342,7 +342,9 @@ In terms of overhead, while the bare metal consumes about 10% of CPU usage, Dock
 
 ##### Memory Usage inside KVM 
 
+We also investigate how much memory is used inside VM and on host. From the graph below we see that the VM has not saturated its 2GB memory limit. We therefore understand that for our test setups memory is not a bottleneck.
 
+![Memory Usage inside VM and on host](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,VM,sysstat,MEM.pdf.svg)
 
 #### Comparing Performance of Suricata in Four Setups
 
@@ -384,5 +386,17 @@ We see that while the decoding speed is comparable at 1X load, the decoding spee
 If we switch unit to KBytes, we see that as load increases, Suricata in VM runs slower and slower.
 
 ![Cumulative Data Decoded in KBytes by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,Decoded_Bytes_BM_vs_KVM.pdf.svg)
+
+#### Other Interesting Comparisons
+
+##### When Memory is a Bottleneck before CPU
+
+We compare the following setups: Docker with vtap versus VM, 2GB versus 512MB, under 4X load. We did test with 1GB memory limit, but it turns out no difference from 2GB limit since VM's CPU bottleneck prevented VM from consuming more memory. Therefore we use 512MB memory limit. We compare Docker with vtap with VM so that the overhead of macvtap appears on both sides.
+
+
+
+
+
+
 
 
