@@ -1,0 +1,5 @@
+opreport --symbols --demangle=smart `which suricata` --merge=all -g > report.txt
+opreport --symbols --demangle=smart `which suricata` -g > report_tids.txt
+opreport --symbols --demangle=smart `which suricata` -g -d > report_details.txt
+opannotate --source --assembly `which suricata` > annotate.txt
+opannotate --source --assembly --merge=all `which suricata` > annotate_merged.txt
