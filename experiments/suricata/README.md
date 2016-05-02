@@ -437,6 +437,42 @@ We see that Docker incurs trivial resource overhead compared to bare metal, whil
 
 #### Throughput
 
+The trace file `snort.log.1425823194` sends high volume of data in short period of time (from second 4 to second 24).
+
+![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/snort.log.netout_bm_1x.pdf.svg)
+
+#### Performance of Suricata
+
+Unfortunately for a trace with high throughput like `snort.log.1425823194`, the sampling interval should have been in magnitudes of milliseconds, which is neither practical nor supported by Suricata. Even a tiny drift in sampling interval will result in nontrivial difference in graph. Because of this, we have to discard the intermediate samples and only take a look at the final result.
+
+|   Setup    | Load | Time | Dropped.Pkts | Decoded.Pkts | Decoded.B  |
+|:----------:|:----:|:----:|:------------:|:------------:|:----------:|
+| Bare Metal |  1X  | 29 s |       0      |    142202    |  157287081 |
+|   Docker   |  1X  | 29 s |       0      |    142202    |  157287081 |
+|  DockerV   |  1X  | 29 s |       0      |    142203    |  157287151 |
+|     KVM    |  1X  | 22 s |     15827    |     74751    |   83002106 |
+| Bare Metal |  2X  | 29 s |       0      |    284404    |  314574162 |
+|   Docker   |  2X  | 29 s |       0      |    284404    |  314574162 |
+|  DockerV   |  2X  | 29 s |       0      |    284405    |  314574232 |
+|     KVM    |  2X  | 22 s |     98690    |     82062    |   90416887 |
+| Bare Metal |  4X  | 29 s |     65912    |    501962    |  554146012 |
+|   Docker   |  4X  | 29 s |     65205    |    502995    |  554640440 |
+|  DockerV   |  4X  | 29 s |     82129    |    486083    |  535445360 |
+|     KVM    |  4X  | 22 s |    276278    |     82366    |   90245739 |
+
+Note: Time column is when the sample numbers no longer increase and reach consensus. Because we take medians of all samples to form a representation, at least half samples complete by that time.
+
+Some numbers look really confusing. For example, in VM setup a non-trivial portion of packets were not captured, and thus neither decoded nor dropped. However, by checking the NIC statistics, we can confirm that the packets were seen at the NIC. For instance, in 4xKVM test 570381 (sum of medians) packets are observed on host's receiving NIC and 523621 (sum of medians) packets are observed on VM's receiving NIC. For some reason Suricata inside the VM does not catch them, but reaches consensus much sooner than other setups.
+
+#### Host CPU Usage
+
+CPU is not saturated; none of the four cores are 100% utilized.
+
+#### Host Memory Usage
+
+Memory is not saturated.
+
+
 
 
 
