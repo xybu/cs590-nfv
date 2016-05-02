@@ -183,6 +183,8 @@ and has a RAM limit of 2GB (1536m and 1g are also tested).
 In Docker-vtap setting, the difference from Docker setup is that we create a macvtap of model "virtio" and mode "passthrough" to
 mirror the traffic arriving at host's enp34s0 NIC, and let Suricata in Docker inspect the traffic on the macvtap device. This is an "intermediate" setup between Docker setup and VM setup, because the cost of running macvtap is unavoidable in VM setup.
 
+In the text that follows, I will use "DockerV" to refer to this setup.
+
 ![Docker-vtap setup](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/diagrams/docker_vtap.svg)
 
 #### Virtual machine
@@ -291,11 +293,11 @@ In the following sections, I'll use "load" to mean a unit of TCPreplay process. 
 
 It takes about 8 seconds for Suricata to initialize for all four setups. After Suricata loads, the sender will start replaying the trace.
 
-At 1X load, we see that Docker and Docker with vtap setups use almost the same amount of CPU share as that of bare metal setup, fluctuating near 25%, whereas the VM raises the host CPU usage to a range between 200% and 350%. The CPU usage of VM setup fluctuates greatly but is highly correspondent to the trace throughput. Note that when the VM runs without Suricata, the host CPU usage is about 2% to 5%.
+At 1X load, we see that Docker and DockerV setups use almost the same amount of CPU share as that of bare metal setup, fluctuating near 25%, whereas the VM raises the host CPU usage to a range between 200% and 350%. The CPU usage of VM setup fluctuates greatly but is highly correspondent to the trace throughput. Note that when the VM runs without Suricata, the host CPU usage is about 2% to 5%.
 
 ![CPU Usage of Four Setups at 1X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_1X.pdf.svg)
 
-At 2X load level, we see that the CPU usage of bare metal, Docker, and Docker w/ vtap setups doubles but still close to each other, and the VM setup has host CPU saturated.
+At 2X load level, we see that the CPU usage of bare metal, Docker, and DockerV setups doubles but still close to each other, and the VM setup has host CPU saturated.
 
 ![CPU Usage of Four Setups at 2X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_2X.pdf.svg)
 
@@ -317,7 +319,7 @@ But what's the overhead of macvtap traffic mirroring?
 
 ##### CPU Overhead of Docker and Macvtap
 
-By comparing the CPU usage of Bare metal, Docker, and Docker with vtap setups, we can gain insight on how much overhead Docker and macvtap introduces, respectively:
+By comparing the CPU usage of Bare metal, Docker, and DockerV setups, we can gain insight on how much overhead Docker and macvtap introduces, respectively:
 
 ![CPU Usage Overhead of Macvtap](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_VTAP.pdf.svg)
 
@@ -373,7 +375,7 @@ Packet dropping is a sign that Suricata can't process the workload given the res
 
 Because the data cannot fit well in one graph, we first compare Docker setups with bare metal, and then VM setup with baremetal.
 
-We first compare Docker and Docker with vtap setups with bare metal, and see that there is no nontrivial difference between the three. In this case, there is no need to compare the number of bytes decoded because they will be on par with each other.
+We first compare Docker and DockerV setups with bare metal, and see that there is no nontrivial difference between the three. In this case, there is no need to compare the number of bytes decoded because they will be on par with each other.
 
 ![Cumulative Data Decoded in Packets by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,Decoded_Pkts_BM_vs_Dockers.pdf.svg)
 
@@ -387,13 +389,53 @@ If we switch unit to KBytes, we see that as load increases, Suricata in VM runs 
 
 ![Cumulative Data Decoded in KBytes by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,Decoded_Bytes_BM_vs_KVM.pdf.svg)
 
-#### Other Interesting Comparisons
+#### When Memory Is Also a Bottleneck
 
-##### When Memory is a Bottleneck before CPU
+In the previous tests, we set memory limit of 2GB which turns out sufficient for all setups and all four load levels. In this part we change memory limit to 512MB and see how resource usage and performance would change. From our previous tests we see that even 512MB is sufficient for 1X load on VM yet CPU becomes bottleneck of VM since 2X load. While we could tweak the parameters to isolate the CPU bottleneck, it's also reasonable to change the memory limit and observe the difference. Note that we did test with 1GB memory limit, but it turns out no difference from 2GB limit since VM's CPU bottleneck prevented VM from consuming more memory.
 
-We compare the following setups: Docker with vtap versus VM, 2GB versus 512MB, under 4X load. We did test with 1GB memory limit, but it turns out no difference from 2GB limit since VM's CPU bottleneck prevented VM from consuming more memory. Therefore we use 512MB memory limit. We compare Docker with vtap with VM so that the overhead of macvtap appears on both sides.
+Therefore we compare the following two setups: DockerV versus VM under 512MB memory limit and 4X load. We choose those two setups so that the overhead of macvtap appears on both sides. For convenience we include their 2GB counterparts in the graphs.
 
+##### Host CPU Usage
 
+We see that 512MB has no effect on DockerV setup, but the CPU usage starts to decrease for 512MB VM since around 150 second. As we will see in a later graph, VM memory saturates there and thrashing occurs.
+
+![Host CPU Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,4,512MB,CPU_2G_vs_512M.pdf.svg)
+
+##### Host Memory Usage
+
+There is not much to say about host memory usage. There is no difference between 2GB limit and 512MB limit in DockerV setup, while the VM memory hits its limit and cannot increase further. The memory increase after the point of thrashing is largely due to host caching the disk swap I/O of VM.
+
+![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,4,512MB,MEM_2G_vs_512M.pdf.svg)
+
+##### Memory Usage in VM
+
+Memory usage in VM confirms that thrashing starts after approx. 150 seconds. We will inspect the memory usage drop near 328 second with behavior of Suricata.
+
+![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,4,512MB,VM,sysstat,MEM.pdf.svg)
+
+##### Performance of Suricata
+
+We see that Suricata in DockerV setup shows no difference in performance given the two memory limits as the lines for their packet captured match well, and neither drop any packets. KVM with 2GB memory limit matches the DockerV packet captured line well until near the end; its lack of CPU power makes it impossible for Suricata to finish with all packets within the given time frame.
+
+What's worth noting is that the graph seems to indicate that 512MB KVM Suricata captures more packets than other scenarios. However, this is not the case. Memory thrashing inside VM drifts Suricata's logging intervals (in unit of seconds), and when we put all series into one X-axis the drift is assumed non-existent even though it gets increasingly severe as time goes by. This can be verified by comparing the raw statistics of NIC traffic on host and inside VM manually.
+
+![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,4,512MB,EVE,Capture,Drop.pdf.svg)
+
+We see that Suricata inside 512MB VM is struggling to make slow progress, while Suricata in 512MB DockerV works just fine. Note that the slight drop of the line for 512MB KVM near 360 second is caused by the fact that we take medians of samples.
+
+![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,4,512MB,EVE,Decode_KB.pdf.svg)
+
+#### Increasing the Load Level
+
+From result of other test configurations, we see that Docker setup is on a par with bare metal in terms of both resource usage and performance, up to 32X load level, beyond which we did not test since the sender host would be overly saturated.
+
+#### Summary
+
+We see that Docker incurs trivial resource overhead compared to bare metal, while KVM's overhead is order of magnitude more than what Suricata itself uses. In terms of performance, while Docker imposes negligible, if any, penalty, KVM makes it much less efficient to run Suricata's instructions and makes CPU a bottleneck at relatively low load levels.
+
+### snort.log.1425823194
+
+#### Throughput
 
 
 
