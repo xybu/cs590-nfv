@@ -283,7 +283,7 @@ We analyze the results of the two trace files, respectively.
 
 The following is the recorded throughput of trace `bigFlows.pcap` when played by _one_ TCPreplay process. When there are two, three, or four TCPreplay processes, the throughput is simply multiplied because the sender host is not saturated in terms of CPU, memory, or NIC throughput. This can be confirmed by the system stat log of sender host.
 
-![Throughput of bigFlows.pcap](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20NETOUT_BM_1X_out.pdf.svg)
+![Throughput of bigFlows.pcap](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20NETOUT_BM_1X.pdf.svg)
 
 In the following sections, I'll use "load" to mean a unit of TCPreplay process. For example, "2X load" means using two concurrent TCPreplay processes.
 
@@ -293,50 +293,96 @@ It takes about 8 seconds for Suricata to initialize for all four setups. After S
 
 At 1X load, we see that Docker and Docker with vtap setups use almost the same amount of CPU share as that of bare metal setup, fluctuating near 25%, whereas the VM raises the host CPU usage to a range between 200% and 350%. The CPU usage of VM setup fluctuates greatly but is highly correspondent to the trace throughput. Note that when the VM runs without Suricata, the host CPU usage is about 2% to 5%.
 
-![CPU Usage of Four Setups at 1X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_1X_out.pdf.svg)
+![CPU Usage of Four Setups at 1X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_1X.pdf.svg)
 
 At 2X load level, we see that the CPU usage of bare metal, Docker, and Docker w/ vtap setups doubles but still close to each other, and the VM setup has host CPU saturated.
 
-![CPU Usage of Four Setups at 2X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_2X_out.pdf.svg)
+![CPU Usage of Four Setups at 2X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_2X.pdf.svg)
 
 3X and 4X load levels reveal similar result -- CPU usage tripled and quadrupled, respectively, compared to 1X load level, and VM setup consumed all host CPU resource.
 
-![CPU Usage of Four Setups at 3X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_3X_out.pdf.svg)
+![CPU Usage of Four Setups at 3X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_3X.pdf.svg)
 
-![CPU Usage of Four Setups at 4X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_4X_out.pdf.svg)
+![CPU Usage of Four Setups at 4X Load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_4X.pdf.svg)
 
 ##### Comparing CPU Usage of Bare Metal and Docker Setups
 
 Here is a diagram that puts the CPU usage of all setups except for VM and at ll load levels:
 
-![CPU Usage of Setups excl. VM at Various Loads](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_XCPT_KVM_out.pdf.svg)
+![CPU Usage of Setups excl. VM at Various Loads](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_XCPT_KVM.pdf.svg)
 
 We see that Docker layer imposes trivial (with respect to overall CPU usage) overhead to host CPU when Suricata inspects the trace traffic at all four load levels.
 
 But what's the overhead of macvtap traffic mirroring?
 
-##### CPU Overhead of Macvtap
+##### CPU Overhead of Docker and Macvtap
 
-By comparing the CPU usage of Docker and Docker with vtap setups, we can gain insight on how much overhead macvtap introduces:
+By comparing the CPU usage of Bare metal, Docker, and Docker with vtap setups, we can gain insight on how much overhead Docker and macvtap introduces, respectively:
 
-![CPU Usage Overhead of Macvtap](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_VTAP_out.pdf.svg)
+![CPU Usage Overhead of Macvtap](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20CPU_VTAP.pdf.svg)
 
-We see that at 4X load, there is a roughly 0% to 5% increase in CPU usage after using macvtap, depending on traffic throughput. Note that we found macvtap of mode "passthrough" (requiring VT-d and SR-IOV) and model "virtio" the approach that incurs the least overhead compared to other ways of redirecting traffic including bridging, Virtual Ethernet Port Aggregator (VEPA), etc. With other approaches of redirecting traffic, the overhead can go higher.
+While the CPU usage overhead of Docker is trivial at 4X load, there is a roughly 0% to 5% increase in CPU usage with macvtap, depending on traffic throughput. Note that we found macvtap of mode "passthrough" (requiring VT-d and SR-IOV) and model "virtio" the approach that incurs the least overhead compared to other ways of redirecting traffic including bridging, Virtual Ethernet Port Aggregator (VEPA), etc. With other approaches of redirecting traffic, the overhead can go higher.
 
 By making this comparison we see that
 
  - By exposing the host NIC directly to Docker container, the overhead of mirroring traffic can be saved.
- - The high CPU usage of VM setup is not caused by macvtap traffic redirection.
+ - The high CPU usage of VM setup is not caused by macvtap traffic redirection; however, the CPU resource needed to redirect traffic it not negligible.
 
 #### Comparing Memory Usage of Four Setups
 
 The result of memory usage is so simple that they can be put in one diagram:
 
-![Memory Usage of Four Setups](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20MEM_ALL_out.pdf.svg)
+![Memory Usage of Four Setups](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,%20MEM_ALL.pdf.svg)
 
 We see that increasing the load level barely increases the host memory usage on bare metal, Docker, and Docker with vtap setups. However, increasing load level dramatically increases the host memory usage on VM setup.
 
 Note that even though after 150 seconds the memory usage of 2X, 3X, 4X load levels is about the same for VM setups, for those load levels, it's the host CPU that is a bottleneck. This prevents Suricata from increasing speed and taking more memory, and also explains why the memory usage there slightly decreases as load increases -- CPU is saturated and the system needs more CPU time to handle the network traffic, making Suricata run with even less resource. It's still noteworthy that for VM setup when CPU is not a bottleneck, the host observes an up to 15% memory usage increase. I therefore conjecture that if CPU were not a bottleneck, the memory usage will go spectacularly higher.
 
-In terms of overhead, while the bare metal consumes about 10% of CPU usage, Docker setups impose trivial memory head, whereas the VM setup can eat three times as much, resulting in a up to 250% overhead when busy and 300% over when idle.
+In terms of overhead, while the bare metal consumes about 10% of CPU usage, Docker setups impose trivial memory head, whereas the VM setup can eat three times as much, resulting in a up to 250% overhead when busy and 300% when idle.
+
+##### Memory Usage inside KVM 
+
+
+
+#### Comparing Performance of Suricata in Four Setups
+
+Suricata exports performance metric in intervals of, by default, 8 seconds, to log files. We examine the log file and compare the following metrics:
+
+ * _capture.kernel_packets_: The accumulative number of packets Suricata has captured.
+ * _capture.kernel_drops_: The accumulative number of packets Suricata has dropped.
+ * _decoder.pkts_: The accumulative number of packets Suricata has decoded.
+ * _decoder.bytes_: The accumulative amount of data, in Bytes, Suricata has decoded. We post processed the data to use unit of KiB rather than B.
+
+We do not examine the number of alerts triggered because it's highly affected by packet dropping.
+
+##### Packet Capturing
+
+We see that in all four load levels we use, packet capturing is about the same for all four setups. However, the VM setup tends to receive less packets in the end. Usually TCPreplay ends at second 312 and we send SIGTERM signal to Suricata 30 seconds after and wait for it to exit gracefully. It's very likely that for VM setup it still has packets yet to capture when exiting, resulting in the discrepancy we see here.
+
+![Cumulative Packet Captured by Suricata in Four Setups](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,CAPTURE.pdf.svg)
+
+##### Packet Dropping
+
+Packet dropping is a sign that Suricata can't process the workload given the resource it can utilize. Only VM setup observes packet drop starting from 2X load, and almost all increased load beyond 2X is dropped.
+
+![Cumulative Packet Dropped by Suricata in Four Setups](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,DROP.pdf.svg)
+
+##### Data Decoding
+
+Because the data cannot fit well in one graph, we first compare Docker setups with bare metal, and then VM setup with baremetal.
+
+We first compare Docker and Docker with vtap setups with bare metal, and see that there is no nontrivial difference between the three. In this case, there is no need to compare the number of bytes decoded because they will be on par with each other.
+
+![Cumulative Data Decoded in Packets by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,Decoded_Pkts_BM_vs_Dockers.pdf.svg)
+
+We then compare VM setup with bare metal.
+
+![Cumulative Data Decoded in Packets by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,BM_vs_KVM.pdf.svg)
+
+We see that while the decoding speed is comparable at 1X load, the decoding speed of VM Suricata is significantly lower as load increases from 2X to 4X, and there is no difference in decoding between 3X load and 4X load, which indicates that Suricata is saturated.
+
+If we switch unit to KBytes, we see that as load increases, Suricata in VM runs slower and slower.
+
+![Cumulative Data Decoded in KBytes by Suricata, Bare metal vs Docker](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/bigFlows.pcap,1-4,eve,Decoded_Bytes_BM_vs_KVM.pdf.svg)
+
 
