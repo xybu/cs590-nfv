@@ -643,6 +643,8 @@ run Suricata's instructions and makes CPU a bottleneck at relatively low load le
 
 ### snort.log.1425823194
 
+# TO BE CONSTRUCTED
+
 #### Throughput
 
 The trace file `snort.log.1425823194` sends high volume of data in short period of time (from second 4 to second 24).
@@ -670,19 +672,12 @@ Unfortunately for a trace with high throughput like `snort.log.1425823194`, the 
 
 Note: Time column is when the sample numbers no longer increase and reach consensus. Because we take medians of all samples to form a representation, at least half samples complete by that time.
 
-Some numbers look really confusing. For example, in VM setup a non-trivial portion of packets were not captured, and thus neither decoded nor dropped. However, by checking the NIC statistics, we can confirm that the packets were seen at the NIC. For instance, in 4xKVM test 570381 (sum of medians) packets are observed on host's receiving NIC and 523621 (sum of medians) packets are observed on VM's receiving NIC. For some reason Suricata inside the VM does not catch them, but reaches consensus much sooner than other setups.
+Bare metal and Docker results are as expected -- they are on a par with each other. DockerV drops more packets but is still in the same magnitude as bare metal and Docker.
 
-#### Host CPU Usage
+Again, VM setup reveals problem. A non-trivial portion of packets were not captured, and thus neither decoded nor dropped. By checking the NIC statistics, we can confirm that the packets did arrive at the VM NIC.
 
-CPU is not saturated; none of the four cores are 100% utilized.
+#### Investigating the VM Issue
 
-#### Host Memory Usage
-
-Memory is not saturated.
-
-
-
-
-
-
-
+Instead of plotting the statistics for 4xKVM test we gathered previously, the points of which were too sparse and did not fit on a
+single, absolute timeline, we shortened the stat interval to 1 second for both our system monitor and Suricata, and then synchronized
+clocks of all machines, and reran the 4xKVM test. We will use this instance to gain insight about what happened to the 4xKVM case.
