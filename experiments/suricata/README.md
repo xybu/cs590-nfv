@@ -502,14 +502,144 @@ We find that it takes significantly more (aggregated) time to read x86 Timestamp
 shows, and to move register value from `%rdi` to `%rax`.
 
 Unfortunately we fail to obtain a callgraph from oprofile which could let us know the reason why it spends more time on those
-instructions -- is it simply due to the fact that those instructions run slow in VM? Or is it more caused by more frequent calls to
-this function?
+instructions -- is it simply because those instructions run slowly in VM? Or is it because this function is triggered more frequently?
 
-// TODO: Investigate this.
+To investigate this, we copy the source code of `UtilCpuGetTicks` into separate C file [test_rtdsc.c](test_rdtsc/test_rdtsc.c), and write a `main` function that calls this function 10^8 times. We run this program in both bare metal and VM, measuring how much time it takes to finish with `time` command, and the distribution of time onto the instructions with oprofile. The raw result is saved in [test_rdtsc/](test_rdtsc/) directory.
+
+We find that it takes only 6.6 seconds (43.35% attributable to `rdtsc`) in bare metal, but 126.09 seconds (47.90% attributable to
+`rdtsc`) inside VM. We also note that the instruction to update the loop counter, which is the first instruction after `cpuid`, also
+takes significant amount of time (44.34% in bare metal; 47.44% in VM).
+
+According to [Table 21-6, Intel Manual Volume 3B, pp.21-13](http://www.intel.com/Assets/en_US/PDF/manual/253669.pdf), the instruction
+`rdtsc` could trigger a VM exit, making the instruction expensive in VM environment.
+
+The instruction `cpuid` is often paired with `rdtsc` to prevent `rdtsc` from being executed out-of-order:
+
+> In order to keep the RDTSC instruction from being performed out-of-order, a serializing instruction is required. A
+> serializing instruction will force every preceding instruction in the code to complete before allowing the program to
+> continue. One such instruction is the CPUID instruction, which is normally used to identify the processor on which
+> the program is being run. For the purposes of this paper, the CPUID instruction will only be used to force the
+> in-order execution of the RDTSC instruction.
+
+-- [Coorporation, I. (1997). Using the RDTSC Instruction for Performance Monitoring. Techn. Ber., tech. rep., Intel Coorporation, 22.](https://www.ccsl.carleton.ca/~jamuir/rdtscpm1.pdf)
+
+With a tool provided in QEMU repository written by Avi Kivity <avi@redhat.com>, we can check the "Primary Processor-Based VM-Execution
+Controls" of our test CPU:
+
+```
+sudo ./vmxcap.py    Basic VMX Information
+  Revision                                 14
+  VMCS size                                1024
+  VMCS restricted to 32 bit addresses      no
+  Dual-monitor support                     yes
+  VMCS memory type                         6
+  INS/OUTS instruction information         yes
+  IA32_VMX_TRUE_*_CTLS support             yes
+pin-based controls
+  External interrupt exiting               yes
+  NMI exiting                              yes
+  Virtual NMIs                             yes
+  Activate VMX-preemption timer            yes
+  Process posted interrupts                no
+primary processor-based controls
+  Interrupt window exiting                 yes
+  Use TSC offsetting                       yes
+  HLT exiting                              yes
+  INVLPG exiting                           yes
+  MWAIT exiting                            yes
+  RDPMC exiting                            yes
+  RDTSC exiting                            yes
+  CR3-load exiting                         default
+  CR3-store exiting                        default
+  CR8-load exiting                         yes
+  CR8-store exiting                        yes
+  Use TPR shadow                           yes
+  NMI-window exiting                       yes
+  MOV-DR exiting                           yes
+  Unconditional I/O exiting                yes
+  Use I/O bitmaps                          yes
+  Monitor trap flag                        yes
+  Use MSR bitmaps                          yes
+  MONITOR exiting                          yes
+  PAUSE exiting                            yes
+  Activate secondary control               yes
+secondary processor-based controls
+  Virtualize APIC accesses                 yes
+  Enable EPT                               yes
+  Descriptor-table exiting                 yes
+  Enable RDTSCP                            yes
+  Virtualize x2APIC mode                   yes
+  Enable VPID                              yes
+  WBINVD exiting                           yes
+  Unrestricted guest                       no
+  APIC register emulation                  no
+  Virtual interrupt delivery               no
+  PAUSE-loop exiting                       no
+  RDRAND exiting                           no
+  Enable INVPCID                           no
+  Enable VM functions                      no
+  VMCS shadowing                           no
+  RDSEED exiting                           no
+  EPT-violation #VE                        no
+  Enable XSAVES/XRSTORS                    no
+VM-Exit controls
+  Save debug controls                      default
+  Host address-space size                  yes
+  Load IA32_PERF_GLOBAL_CTRL               yes
+  Acknowledge interrupt on exit            yes
+  Save IA32_PAT                            yes
+  Load IA32_PAT                            yes
+  Save IA32_EFER                           yes
+  Load IA32_EFER                           yes
+  Save VMX-preemption timer value          yes
+VM-Entry controls
+  Load debug controls                      default
+  IA-32e mode guest                        yes
+  Entry to SMM                             yes
+  Deactivate dual-monitor treatment        yes
+  Load IA32_PERF_GLOBAL_CTRL               yes
+  Load IA32_PAT                            yes
+  Load IA32_EFER                           yes
+Miscellaneous data
+  VMX-preemption timer scale (log2)        5
+  Store EFER.LMA into IA-32e mode guest control no
+  HLT activity state                       yes
+  Shutdown activity state                  yes
+  Wait-for-SIPI activity state             yes
+  IA32_SMBASE support                      no
+  Number of CR3-target values              4
+  MSR-load/store count recommendation      0
+  IA32_SMM_MONITOR_CTL[2] can be set to 1  no
+  VMWRITE to VM-exit information fields    no
+  MSEG revision identifier                 0
+VPID and EPT capabilities
+  Execute-only EPT translations            yes
+  Page-walk length 4                       yes
+  Paging-structure memory type UC          yes
+  Paging-structure memory type WB          yes
+  2MB EPT pages                            yes
+  1GB EPT pages                            no
+  INVEPT supported                         yes
+  EPT accessed and dirty flags             no
+  Single-context INVEPT                    yes
+  All-context INVEPT                       yes
+  INVVPID supported                        yes
+  Individual-address INVVPID               yes
+  Single-context INVVPID                   yes
+  All-context INVVPID                      yes
+  Single-context-retaining-globals INVVPID yes
+VM Functions
+  EPTP Switching                           no
+```
+
+So for our test environment `rdtsc` IS yielding VM exiting, and combined with `cpuid`, giving huge performance penalty to Suricata
+running inside a virtual machine.
 
 #### Summary
 
-We see that Docker incurs trivial resource overhead compared to bare metal, while KVM's overhead is order of magnitude more than what Suricata itself uses. In terms of performance, while Docker imposes negligible, if any, penalty, KVM makes it much less efficient to run Suricata's instructions and makes CPU a bottleneck at relatively low load levels.
+We see that Docker incurs trivial resource overhead compared to bare metal, while KVM's overhead is order of magnitude more than what
+Suricata itself uses. In terms of performance, while Docker imposes negligible, if any, penalty, KVM makes it much less efficient to
+run Suricata's instructions and makes CPU a bottleneck at relatively low load levels.
 
 ### snort.log.1425823194
 
