@@ -11,6 +11,10 @@
 # the COPYING file in the top-level directory.
 # Reference: http://git.qemu.org/?p=qemu.git;a=blob_plain;f=scripts/kvm/vmxcap
 
+import os
+
+os.system('sudo modprobe msr')
+
 MSR_IA32_VMX_BASIC = 0x480
 MSR_IA32_VMX_PINBASED_CTLS = 0x481
 MSR_IA32_VMX_PROCBASED_CTLS = 0x482
