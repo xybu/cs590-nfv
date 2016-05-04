@@ -15,8 +15,6 @@ from dataparser import mon
 from dataparser import exceptions
 
 
-DATA_VALUT_DIR = "/scratch/bu1/suricataAll"
-
 evecollections = dict()
 netstatcollections = dict()
 sysstatcollections = dict()
