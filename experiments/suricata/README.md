@@ -237,21 +237,18 @@ We have the following tests:
 |     Docker    | bigFlows.pcap |       4          |     No    | 512 MB   |  4  |     5      | -                    |     10      |
 | Docker + vtap | bigFlows.pcap |       4          |    Yes    | 512 MB   |  4  |     5      | -                    |     10      |
 |       VM      | bigFlows.pcap |       4          |    Yes    | 512 MB   |  4  |     5      | vCPUs=4              |     30      |
-|   Bare metal  | snort.log.1425823194 |       1          |     No    |   4 GB   |  4  |     5      | -                    |      40     |
-|     Docker    | snort.log.1425823194 |       1          |     No    |   2 GB   |  4  |     5      | -                    |      40     |
-| Docker + vtap | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | -                    |      40     |
-|       VM      | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      40     |
-|   Bare metal  | snort.log.1425823194 |       2          |     No    |   4 GB   |  4  |     5      | -                    |      80     |
-|     Docker    | snort.log.1425823194 |       2          |     No    |   2 GB   |  4  |     5      | -                    |      80     |
-| Docker + vtap | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | -                    |      80     |
-|       VM      | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      80     |
-|   Bare metal  | snort.log.1425823194 |       4          |     No    |   4 GB   |  4  |     5      | -                    |     120     |
-|     Docker    | snort.log.1425823194 |       4          |     No    |   2 GB   |  4  |     5      | -                    |      80     |
-| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | -                    |      80     |
-|       VM      | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | vCPUs=4              |      80     |
-|     Docker    | snort.log.1425823194 |       4          |     No    |  1024 MB |  4  |     5      | -                    |      43     |
-| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |  1024 MB |  4  |     5      | -                    |      43     |
-|       VM      | snort.log.1425823194 |       4          |    Yes    |  1024 MB |  4  |     5      | vCPUs=4              |      43     |
+|   Bare metal  | snort.log.1425823194 |       1          |     No    |   4 GB   |  4  |     5      | stat=1s       |      30     |
+|     Docker    | snort.log.1425823194 |       1          |     No    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+| Docker + vtap | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+|       VM      | snort.log.1425823194 |       1          |    Yes    |   2 GB   |  4  |     5      | stat=1s, vCPUs=4 |   30     |
+|   Bare metal  | snort.log.1425823194 |       2          |     No    |   4 GB   |  4  |     5      | stat=1s       |      30     |
+|     Docker    | snort.log.1425823194 |       2          |     No    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+| Docker + vtap | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+|       VM      | snort.log.1425823194 |       2          |    Yes    |   2 GB   |  4  |     5      | stat=1s, vCPUs=4 |   30     |
+|   Bare metal  | snort.log.1425823194 |       4          |     No    |   4 GB   |  4  |     5      | stat=1s       |      30     |
+|     Docker    | snort.log.1425823194 |       4          |     No    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+| Docker + vtap | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | stat=1s       |      30     |
+|       VM      | snort.log.1425823194 |       4          |    Yes    |   2 GB   |  4  |     5      | stat=1s, vCPUs=4 |   30     |
 
 Notes
 
@@ -643,41 +640,49 @@ run Suricata's instructions and makes CPU a bottleneck at relatively low load le
 
 ### snort.log.1425823194
 
-# TO BE CONSTRUCTED
-
 #### Throughput
 
-The trace file `snort.log.1425823194` sends high volume of data in short period of time (from second 4 to second 24).
+The trace file `snort.log.1425823194` sends high volume of data in short period of time (about 22 seconds). Data is collected with granularity of 1 second.
 
-![Host Memory Usage, DockerV vs VM](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data/diagrams/snort.log.netout_bm_1x.pdf.svg)
+![Throughput of snort.log trace file](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data2/diagrams/snort.log.netout_1x.pdf.svg)
 
 #### Performance of Suricata
 
-Unfortunately for a trace with high throughput like `snort.log.1425823194`, the sampling interval should have been in magnitudes of milliseconds, which is neither practical nor supported by Suricata. Even a tiny drift in sampling interval will result in nontrivial difference in graph. Because of this, we have to discard the intermediate samples and only take a look at the final result.
+The final result of the tests is as follows.
 
 |   Setup    | Load | Time | Dropped.Pkts | Decoded.Pkts | Decoded.B  |
 |:----------:|:----:|:----:|:------------:|:------------:|:----------:|
 | Bare Metal |  1X  | 29 s |       0      |    142202    |  157287081 |
-|   Docker   |  1X  | 29 s |       0      |    142202    |  157287081 |
-|  DockerV   |  1X  | 29 s |       0      |    142203    |  157287151 |
-|     KVM    |  1X  | 22 s |     15827    |     74751    |   83002106 |
-| Bare Metal |  2X  | 29 s |       0      |    284404    |  314574162 |
-|   Docker   |  2X  | 29 s |       0      |    284404    |  314574162 |
-|  DockerV   |  2X  | 29 s |       0      |    284405    |  314574232 |
-|     KVM    |  2X  | 22 s |     98690    |     82062    |   90416887 |
-| Bare Metal |  4X  | 29 s |     65912    |    501962    |  554146012 |
-|   Docker   |  4X  | 29 s |     65205    |    502995    |  554640440 |
-|  DockerV   |  4X  | 29 s |     82129    |    486083    |  535445360 |
-|     KVM    |  4X  | 22 s |    276278    |     82366    |   90245739 |
+|   Docker   |  1X  | 28 s |       0      |    142202    |  157287081 |
+|  DockerV   |  1X  | 26 s |       0      |    142203    |  157287081 |
+|     KVM    |  1X  | 18 s |     18788    |     71412    |   79238466 |
+| Bare Metal |  2X  | 28 s |       0      |    284404    |  314574162 |
+|   Docker   |  2X  | 27 s |       0      |    284404    |  314574162 |
+|  DockerV   |  2X  | 26 s |       0      |    284405    |  314574232 |
+|     KVM    |  2X  | 18 s |     98456    |     81927    |   90416861 |
+| Bare Metal |  4X  | 29 s |     67126    |    500749    |  552477875 |
+|   Docker   |  4X  | 27 s |     67064    |    500793    |  553071996 |
+|  DockerV   |  4X  | 27 s |     81282    |    487527    |  537692948 |
+|     KVM    |  4X  | 18 s |    277529    |     81260    |   89281369 |
 
-Note: Time column is when the sample numbers no longer increase and reach consensus. Because we take medians of all samples to form a representation, at least half samples complete by that time.
+Note: Time column is the amount of time it takes to reach stable value. Because we take medians of all samples to form a representation, at least half samples complete by that time.
 
-Bare metal and Docker results are as expected -- they are on a par with each other. DockerV drops more packets but is still in the same magnitude as bare metal and Docker.
+We see that in terms of performance Docker setup is on a par with bare metal even when CPU is stressed at 4X load. Macvtap consumes CPU, resulting in DockerV setup dropping more packets than Docker setup at 4X load, but it is still in the same magnitude as Docker and bare metal setups.
 
-Again, VM setup reveals problem. A non-trivial portion of packets were not captured, and thus neither decoded nor dropped. By checking the NIC statistics, we can confirm that the packets did arrive at the VM NIC.
+The result of VM setup is noteworthy. Not only it drops significantly more packets, but a nontrivial portion of packets (358789 captured / 568808 total) isn't even captured. In the following section, we will dive deeper into what happens to VM setup at 4X load.
 
 #### Investigating the VM Issue
 
-Instead of plotting the statistics for 4xKVM test we gathered previously, the points of which were too sparse and did not fit on a
-single, absolute timeline, we shortened the stat interval to 1 second for both our system monitor and Suricata, and then synchronized
-clocks of all machines, and reran the 4xKVM test. We will use this instance to gain insight about what happened to the 4xKVM case.
+The following graph puts the cumulative number of packets sent (light blue line), cumulative number of packets received on the VM (orange line), cumulative number of packets captured (gray bar) / dropped (yellow bar) / decoded (dark blue bar) by Suricata, host CPU usage (green line, percentage), and VM memory usage (dark blue line, percentage) together:
+
+![Packet Processing and Resource Usage of VM setup at 4X load](https://rawgithub.com/xybu/cs590-nfv/master/experiments/suricata/data2/diagrams/snort.log.vm_packet_res_4x.pdf.svg)
+
+Note that because we are taking medians, cumulative number of packets sent is not necessarily equal to cumulative number of packets received. I manually inspected several instances and for those instances they are indeed equal.
+
+We see from the graph that Suricata packet capturing thread(s) never manages to process packets that come every single second. Most new packets are dropped and few are decoded. CPU usage reaches ceiling near second 10 and remains high for a few seconds. My guess is that because Suricata can't read packets fast enough, the kernel buffer to hold packets becomes full and new packets are simply dropped. When Suricata catches up it no longer finds more packets to process.
+
+No matter what the reason is, this test confirms again the severe performance degradation of Suricata inside VM setup.
+
+## Conclusion
+
+We see that container solutions like Docker are way more suitable than virtual machines for light-weight programs like Suricata in that (1) less resource is needed, and (2) the high cost of VM exiting triggered by some instructions can be saved.
