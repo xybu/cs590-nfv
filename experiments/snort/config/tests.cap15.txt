@@ -1,0 +1,18 @@
+# Format:
+# nrepeat COMMAND [ARGS]
+1	./update_trace.sh
+
+30 ./test_snort_bare.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5
+30 ./test_snort_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
+30 ./test_snort_docker.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
+30 ./test_snort_vm.py bigFlows.pcap 1 -s em2 -d enp34s0 -t 4 -n snort-vm -m 2g -p 4 -c 0-3 -w 5
+
+30 ./test_snort_bare.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5
+30 ./test_snort_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
+30 ./test_snort_docker.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
+30 ./test_snort_vm.py bigFlows.pcap 2 -s em2 -d enp34s0 -t 4 -n snort-vm -m 2g -p 4 -c 0-3 -w 5
+
+30 ./test_snort_bare.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5
+30 ./test_snort_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3
+30 ./test_snort_docker.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -w 5 -m 2g -c 0-3 -v
+30 ./test_snort_vm.py bigFlows.pcap 4 -s em2 -d enp34s0 -t 4 -n snort-vm -m 2g -p 4 -c 0-3 -w 5
