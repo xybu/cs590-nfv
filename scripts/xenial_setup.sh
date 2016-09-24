@@ -4,7 +4,8 @@ sudo apt-get -y install ack-grep build-essential cmake automake gcc g++ valgrind
 
 alias vi=vim
 
-sudo bash -c 'echo -e "\nbu1 ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
+echo -e "\nbu1 ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+echo -e "\nvm.swappiness = 5" | sudo tee -a /etc/sysctl.conf
 
 # Configure Mercurial.
 hg --config ui.editor "vim"
