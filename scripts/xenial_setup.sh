@@ -27,3 +27,4 @@ git config --global user.name "Xiangyu Bu"
 git config --global user.email "xybu92@live.com"
 git config --global core.editor vim
 
+rsync -zrvpE bu1@cap13.cs.purdue.edu:/home/bu1/.ssh /home/bu1/
