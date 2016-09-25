@@ -48,3 +48,7 @@ curl -fsSL https://get.docker.com/gpg | sudo apt-key add -
 curl -fsSL https://get.docker.com/ | sh
 sudo usermod -aG docker $USER
 sudo pip install -U docker-py
+
+# Mount hard dives.
+sudo fsck -p /dev/sdb1 && sudo bash -c 'echo -e "/dev/sdb1\t/scratch\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
+sudo fsck -p /dev/sdc1 && sudo bash -c 'echo -e "/dev/sdc1\t/scratch2\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
