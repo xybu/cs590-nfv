@@ -38,7 +38,7 @@ sed "s/GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapacc
 sudo update-grub
 
 # Install Python dependencies.
-sudo apt install libssl-dev
+sudo apt install -y libssl-dev
 wget -O- https://bootstrap.pypa.io/get-pip.py | sudo python3
 sudo pip install -U psutil
 sudo pip install -U spur
