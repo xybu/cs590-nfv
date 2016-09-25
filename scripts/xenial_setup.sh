@@ -56,3 +56,14 @@ sudo fsck -p /dev/sdc1 && sudo bash -c 'echo -e "/dev/sdc1\t/scratch2\t\t\t\text
 sudo mkdir /scratch/$USER && sudo chown $USER:$USER /scratch/$USER && ls /scratch -asl
 sudo mkdir /scratch2/$USER && sudo chown $USER:$USER /scratch2/$USER && ls /scratch2 -asl
 
+# Configure NIC.
+sudo bash -c 'echo "" >> /etc/network/interfaces'
+sudo bash -c 'echo "auto enp34s0" >> /etc/network/interfaces'
+sudo bash -c 'echo "iface enp34s0 inet static" >> /etc/network/interfaces'
+sudo bash -c 'echo -e "\taddress 192.168.0.`tr -cd [:digit:] < /etc/hostname`" >> /etc/network/interfaces'
+sudo bash -c 'echo -e "\tnetwork 192.168.0.0" >> /etc/network/interfaces'
+sudo bash -c 'echo -e "\tnetmask 255.255.255.0" >> /etc/network/interfaces'
+sudo bash -c 'echo -e "\tbroadcast 192.168.0.255" >> /etc/network/interfaces'
+sudo ifconfig enp34s0 up
+sudo service networking restart
+ifconfig
