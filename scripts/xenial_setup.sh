@@ -36,3 +36,15 @@ sudo cp -R /home/bu1/.ssh /root/
 sed "s/GRUB_TIMEOUT=[0-9]*/GRUB_TIMEOUT=0/" /etc/default/grub | tee /tmp/grub
 sed "s/GRUB_CMDLINE_LINUX=\"\"/GRUB_CMDLINE_LINUX=\"cgroup_enable=memory swapaccount=1\"/" /tmp/grub | sudo tee /etc/default/grub
 sudo update-grub
+
+# Install Python dependencies.
+sudo apt install libssl-dev
+wget -O- https://bootstrap.pypa.io/get-pip.py | sudo python3
+sudo pip install -U psutil
+sudo pip install -U spur
+
+# Install docker.
+curl -fsSL https://get.docker.com/gpg | sudo apt-key add -
+curl -fsSL https://get.docker.com/ | sh
+sudo usermod -aG docker $USER
+sudo pip install -U docker-py
