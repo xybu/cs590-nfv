@@ -8,7 +8,6 @@ echo -e "\nbu1 ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 echo -e "\nvm.swappiness = 5" | sudo tee -a /etc/sysctl.conf
 
 # Configure Mercurial.
-hg --config ui.editor "vim"
 echo "[ui]" > ~/.hgrc
 echo "username = Xiangyu Bu <xybu92@live.com>" >> ~/.hgrc
 echo "verbose = True" >> ~/.hgrc
@@ -52,3 +51,8 @@ sudo pip install -U docker-py
 # Mount hard dives.
 sudo fsck -p /dev/sdb1 && sudo bash -c 'echo -e "/dev/sdb1\t/scratch\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
 sudo fsck -p /dev/sdc1 && sudo bash -c 'echo -e "/dev/sdc1\t/scratch2\t\t\t\text4\tnodev,nosuid,acl\t\t1\t\t2" >> /etc/fstab'
+
+# Create user dir.
+sudo mkdir /scratch/$USER && sudo chown $USER:$USER /scratch/$USER && ls /scratch -asl
+sudo mkdir /scratch2/$USER && sudo chown $USER:$USER /scratch2/$USER && ls /scratch2 -asl
+
