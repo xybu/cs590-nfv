@@ -13,7 +13,7 @@ libnetfilter-queue-dev libnetfilter-queue1 libnfnetlink-dev libnfnetlink0
 cd /tmp
 wget http://downloads.suricata-ids.org/suricata-current.tar.gz
 tar xvf suricata-current.tar.gz
-cd suricata-3.0.1
+cd suricata-3.1.2
 
 ./configure --enable-nfqueue --enable-unittests --enable-profiling --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 make
