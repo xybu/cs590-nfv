@@ -1,9 +1,9 @@
 # Use latest ubuntu LTS
-FROM ubuntu:wily
+FROM ubuntu:xenial
 
 # ENV VIRTUSER user
 # Suricata version.
-ENV VER=3.0.1
+ENV VER=3.1.2
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies.
@@ -24,7 +24,7 @@ RUN wget http://www.openinfosecfoundation.org/download/suricata-$VER.tar.gz
 RUN tar -xvzf suricata-$VER.tar.gz
 WORKDIR /tmp/suricata-$VER
 RUN ./configure --enable-nfqueue --enable-unittests --enable-profiling --prefix=/usr --sysconfdir=/etc --localstatedir=/var
-RUN make
+RUN make -j2
 # USER root
 RUN make install-full
 RUN ldconfig
