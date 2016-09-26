@@ -34,6 +34,9 @@ What's important here is the kernel module list and grub config.
 http://askubuntu.com/questions/568621/tunner-card-pci-passthrough-on-kvmv
 http://spica-and-roid.blogspot.com/2012_07_01_archive.html
 
+* Difference between SR-IOV (NIC and VT-d) and PCI passthrough (requires VT-d)
+https://www.paloaltonetworks.com/documentation/61/pan-os/newfeaturesguide/virtualization-features/kvm-support
+
 * Set up host NIC passthrough with `virt-manager` GUI:
 http://ask.xmodulo.com/pci-passthrough-virt-manager.html
 
