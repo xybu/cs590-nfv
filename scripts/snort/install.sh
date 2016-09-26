@@ -4,7 +4,7 @@
 # https://www.snort.org/documents/snort-2-9-8-x-on-ubuntu-12-lts-and-14-lts-and-15
 
 TMPDIR="/tmp"
-SNORT_VER="2.9.8.2"
+SNORT_VER="2.9.8.3"
 
 sudo apt-get install -yq wget libpcre3-dev libpcap-dev libdumbnet-dev \
 	build-essential make autoconf automake libtool flex bison \
@@ -27,7 +27,7 @@ sudo ldconfig
 
 cd $TMPDIR/snort-$SNORT_VER
 ./configure --enable-sourcefire --enable-perfprofiling
-make
+make -j2
 sudo make install
 sudo ldconfig
 
