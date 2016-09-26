@@ -1,7 +1,7 @@
-FROM ubuntu:wily
+FROM ubuntu:xenial
 
 ENV TMPDIR=/tmp
-ENV SNORT_VERSION=2.9.8.2
+ENV SNORT_VERSION=2.9.8.3
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -qq
@@ -22,7 +22,7 @@ RUN tar xvf emerging.rules.tar.gz
 
 WORKDIR $TMPDIR/daq-2.0.6
 RUN ./configure
-RUN make
+RUN make -j2
 RUN make install
 RUN ldconfig
 
