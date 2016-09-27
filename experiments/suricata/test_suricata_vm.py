@@ -34,6 +34,7 @@ class TestSuricataVm(TestSuricataBase):
 			ret = self.shell.run(['virsh', 'net-dhcp-leases', 'default'], allow_error=True)
 			for line in ret.output.decode('utf-8').split('\n'):
 				print(line.strip().split())
+				# This assumes that VM name is the same as VM hostname.
 				if vm_name in line:
 					# "2016-04-12 01:13:28  52:54:00:fb:44:5b  ipv4      192.168.122.204/24        suricata-vm     -"
 					return line.strip().split()[4].split('/')[0]

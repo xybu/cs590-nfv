@@ -1,0 +1,30 @@
+# Format:
+# nrepeat COMMAND [ARGS]
+1	./update_trace.sh
+
+# Round 1.
+
+10 ./test_suricata_vm.py snort.log.1425823194 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+
+# Round 2.
+
+10 ./test_suricata_vm.py snort.log.1425823194 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+
+# Round 3.
+
+10 ./test_suricata_vm.py snort.log.1425823194 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 1 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 2 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py snort.log.1425823194 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
+10 ./test_suricata_vm.py bigFlows.pcap 4 -s enp34s0 -d enp34s0 -t 2 -n xenial-ids --vm-nic=ens4 -m 2g -p 4 -c 0-3 -w 5
