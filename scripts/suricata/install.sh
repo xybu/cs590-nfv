@@ -16,7 +16,7 @@ tar xvf suricata-current.tar.gz
 cd suricata-3.1.2
 
 ./configure --enable-nfqueue --enable-unittests --enable-profiling --prefix=/usr --sysconfdir=/etc --localstatedir=/var
-make
+make -j2
 sudo make install-full
 sudo ldconfig
 
