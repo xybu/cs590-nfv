@@ -263,12 +263,12 @@ def main():
 		# Convert to lowercase to achieve case IN-sensitiveness.
 		args.ps_keywords = [k.lower() for k in args.ps_keywords]
 
-	try:
-		chprio(-20)
-		scheduler = sched.scheduler(time.time, time.sleep)
-		sm = SystemMonitor(args.outfile, args.flush)
+	chprio(-20)
+	scheduler = sched.scheduler(time.time, time.sleep)
+	sm = SystemMonitor(args.outfile, args.flush)
+	enable_nic_mon = args.nic is not None
 
-		enable_nic_mon = args.nic is not None
+	try:
 		if enable_nic_mon:
 			try:
 				nm = NetworkInterfaceMonitor(args.nic_outfile, args.nic.split(','), args.flush)
