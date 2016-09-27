@@ -57,6 +57,7 @@ class TestSuricataBase:
 	def upload_test_session(self, session_id, local_tmpdir, session_tmpdir):
 		log('Upload session data to data server...')
 		data_store = '%s@%s:%s/' % (DATA_USER, DATA_HOST, DATA_DIR)
+		self.simple_call(['mkdir', '-p', DATA_DIR])
 		subprocess.call(['sudo', 'rsync', '-zvrpE', local_tmpdir, data_store])
 		self.simple_call(['sudo', 'rsync', '-zvrpE', session_tmpdir, data_store])
 
@@ -96,8 +97,8 @@ class TestSuricataBase:
 				log('Waiting for all %d tcpreplay processes to complete...' % nworker)
 				for w in workers:
 					w.wait()
-				log('All tcpreplay processes are complete. Wait for 20sec before proceeding.')
-				time.sleep(20)
+				log('All tcpreplay processes are complete. Wait for 10sec before proceeding.')
+				time.sleep(10)
 			except KeyboardInterrupt as e:
 				log('Interrupted. Stopping tcpreplay processes...')
 				for w in workers:
