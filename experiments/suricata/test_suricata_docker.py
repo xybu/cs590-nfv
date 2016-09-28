@@ -37,7 +37,7 @@ class TestSuricataDocker(TestSuricataBase):
 			'--nic', nic, '--nic-outfile', 'netstat.{nic}.csv',
 			'--enable-ps', '--ps-keywords', 'suricata', 'docker', '--ps-outfile', 'psstat.docker.csv'],
 			cwd=self.session_tmpdir, store_pid=True, allow_error=True, stdout=sys.stdout.buffer, stderr=sys.stdout.buffer)
-		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'wb')
+		self.suricata_out = open(self.local_tmpdir + '/suricata.out', 'w')
 		self.suricata_proc = self.shell.spawn(['docker', 'run', '-i', '--name', self.container_name, '--cpuset-cpus', self.args.cpuset,
 			'--memory', self.args.memory, '--memory-swappiness', str(self.args.swappiness), '--net=host',
 			'-v', '%s:%s' % (self.session_tmpdir, '/var/log/suricata'), 'xybu:suricata', 'suricata', '-i', dest_nic],
