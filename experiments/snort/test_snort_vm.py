@@ -78,6 +78,8 @@ class TestSnortVm(TestSnortBase):
 
 	def prework(self):
 		self.init_test_session(self.session_id, self.local_tmpdir, self.session_tmpdir, self.args)
+		if len(self.args.pre_script):
+			self.simple_call([RUNNER_TMPDIR + '/tester_script/' + self.args.pre_script])
 		self.reboot_vm()
 
 	def run(self):
@@ -157,6 +159,7 @@ def main():
 	parser.add_argument('--cpuset', '-c', nargs='?', type=str, default='0-3', help='Set of CPUs the VM can use (e.g., "0-3", "1,3-5").')
 	parser.add_argument('--swappiness', '-w', nargs='?', type=int, default=5, help='Memory swappiness on host and in VM (e.g., 5).')
 	parser.add_argument('--replay-speed', nargs='?', type=int, default=1, help='Speed of TCP replay (e.g., 2 for double the speed).')
+	parser.add_argument('--pre-script', nargs='?', type=str, default='', help='If specified, run this script before booting VM.')
 	args = parser.parse_args()
 	log(str(args))
 	TestSnortVm(args).start()
