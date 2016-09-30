@@ -5,7 +5,6 @@ Many software packages have updated since we conducted the experiment. Some impo
 
  * `Ubuntu`: 15.10 -> 16.04.1
  * `GCC`: 4.8.4 -> 5.4.0
- * `python3`: 3.4 -> 3.5
  * `Docker`: 1.11.0 -> 1.21.1
  * `Suricata`: 3.0.1 -> 3.1.2
 
@@ -21,7 +20,7 @@ A series of updates of Suricata, namely, [`3.1`](https://suricata-ids.org/2016/0
 
 Behavior-wise we see that Suricata 3.1.x uses by default 4 mgmt threads and 4 pkt processing threads on our 4-core test machine, while Suricata 3.0.1 used by default 4 mgmt threads and 7 pkt processing threads. Fewer number of threads results in fewer calls to `UtilCpuGetTicks()` as well.
 
-## Performance of Suricata
+## Suricata
 
 We updated Suricata to 3.1.2 in VM and redo the experiment on old VM setup. By comparing the [new excel sheet](https://github.com/xybu/cs590-nfv/blob/master/data/suricata_v312/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C1%2C2g%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) with the [old excel sheet](https://github.com/xybu/cs590-nfv/blob/master/experiments/suricata/data/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C4%2C1536m%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) we see that Suricata managed to capture more packets and decode most of them.
 
@@ -40,7 +39,7 @@ Recall that Suricata 3.0.1 in VM almost saturated the CPU at 1X bigFlows.pcap lo
 
 ![Suricata 3.0.1](https://rawgithub.com/xybu/cs590-nfv/master/data/suricata301_vm_4x_cpu_ram.svg)
 
-# Is `rdtsc` faster in newer version of QEMU?
+## Is `rdtsc` faster in newer version of QEMU?
 
 No it's not. The `test_rdtsc` program still takes ~128 seconds on avg to finish. Recall that in wily setup we have
 
