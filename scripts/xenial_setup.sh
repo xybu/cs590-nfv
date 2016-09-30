@@ -41,6 +41,7 @@ sudo apt install -y libssl-dev
 wget -O- https://bootstrap.pypa.io/get-pip.py | sudo python3
 sudo pip install -U psutil
 sudo pip install -U spur
+sudo pip install -U ciso8601
 
 # Install docker.
 curl -fsSL https://get.docker.com/gpg | sudo apt-key add -
