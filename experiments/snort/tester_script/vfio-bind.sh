@@ -1,1 +1,0 @@
-../../suricata/tester_script/vfio-bind.sh

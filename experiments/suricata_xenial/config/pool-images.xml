@@ -1,0 +1,18 @@
+<pool type='dir'>
+  <name>images</name>
+  <uuid>f16bc042-fc1e-493f-a76a-2a90f2846054</uuid>
+  <capacity unit='bytes'>984373075968</capacity>
+  <allocation unit='bytes'>85835776</allocation>
+  <available unit='bytes'>984287240192</available>
+  <source>
+  </source>
+  <target>
+    <path>/scratch2/bu1/images</path>
+    <permissions>
+      <mode>0775</mode>
+      <owner>1000</owner>
+      <group>1000</group>
+    </permissions>
+  </target>
+</pool>
+

@@ -1,0 +1,27 @@
+<volume type='file'>
+  <name>suricata-vm.qcow2</name>
+  <key>/scratch2/bu1/images/suricata-vm.qcow2</key>
+  <source>
+  </source>
+  <capacity unit='bytes'>68719476736</capacity>
+  <allocation unit='bytes'>2679119872</allocation>
+  <target>
+    <path>/scratch2/bu1/images/suricata-vm.qcow2</path>
+    <format type='qcow2'/>
+    <permissions>
+      <mode>0644</mode>
+      <owner>0</owner>
+      <group>0</group>
+    </permissions>
+    <timestamps>
+      <atime>1460488628.504762739</atime>
+      <mtime>1460488400.599214748</mtime>
+      <ctime>1460488401.151228195</ctime>
+    </timestamps>
+    <compat>1.1</compat>
+    <features>
+      <lazy_refcounts/>
+    </features>
+  </target>
+</volume>
+

@@ -71,8 +71,8 @@ class TestSnortBase:
 		del self.shell
 
 	def wait_for_snort(self, session_tmpdir, prepend=[]):
-		log('Waiting for 60sec for Snort to stabilize...')
-		time.sleep(60)
+		log('Waiting for 4min for Snort to stabilize...')
+		time.sleep(240)
 		log('Wait is complete.')
 
 	def replay_trace(self, local_tmpdir, trace_file, nworker, src_nic, poll_interval_sec, replay_speed_X):
@@ -92,8 +92,8 @@ class TestSnortBase:
 				log('Waiting for all %d tcpreplay processes to complete...' % nworker)
 				for w in workers:
 					w.wait()
-				log('All tcpreplay processes are complete. Wait for 30sec before proceeding.')
-				time.sleep(30)
+				log('All tcpreplay processes are complete. Wait for 60sec before proceeding.')
+				time.sleep(60)
 			except KeyboardInterrupt as e:
 				log('Interrupted. Stopping tcpreplay processes...')
 				for w in workers:

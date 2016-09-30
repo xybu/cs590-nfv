@@ -1,0 +1,108 @@
+time ./test_rdtsc
+126.09user 0.00system 2:06.09elapsed 99%CPU (0avgtext+0avgdata 1184maxresident)k
+0inputs+0outputs (0major+60minor)pagefaults 0swaps
+sudo operf -g ./test_rdtsc
+operf: Profiler started
+* * * * WARNING: Profiling rate was throttled back by the kernel * * * *
+The number of samples actually recorded is less than expected, but is
+probably still statistically valid.  Decreasing the sampling rate is the
+best option if you want to avoid throttling.
+
+Profiling done.
+opannotate --source --assembly test_rdtsc
+Using /tmp/test_rdtsc/oprofile_data/samples/ for session-dir
+
+WARNING! Some of the events were throttled. Throttling occurs when
+the initial sample rate is too high, causing an excessive number of
+interrupts.  Decrease the sampling frequency. Check the directory
+/tmp/test_rdtsc/oprofile_data/samples/current/stats/throttled
+for the throttled event names.
+
+/* 
+ * Command line: opannotate --source --assembly test_rdtsc 
+ * 
+ * Interpretation of command line:
+ * Output annotated assembly listing with samples
+ * 
+ * CPU: Intel Core/i7, speed 2393.98 MHz (estimated)
+ * Counted CPU_CLK_UNHALTED events (Clock cycles when not halted) with a unit mask of 0x00 (No unit mask) count 90000
+ */
+               :
+               :/lib/x86_64-linux-gnu/ld-2.21.so:     file format elf64-x86-64
+               :
+               :
+               :Disassembly of section .plt:
+               :
+/* 
+ * Command line: opannotate --source --assembly test_rdtsc 
+ * 
+ * Interpretation of command line:
+ * Output annotated assembly listing with samples
+ * 
+ * CPU: Intel Core/i7, speed 2393.98 MHz (estimated)
+ * Counted CPU_CLK_UNHALTED events (Clock cycles when not halted) with a unit mask of 0x00 (No unit mask) count 90000
+ */
+Cannot annotate pseudo file /proc/kallsyms -- ignoring.
+/* 
+ * Command line: opannotate --source --assembly test_rdtsc 
+ * 
+ * Interpretation of command line:
+ * Output annotated assembly listing with samples
+ * 
+ * CPU: Intel Core/i7, speed 2393.98 MHz (estimated)
+ * Counted CPU_CLK_UNHALTED events (Clock cycles when not halted) with a unit mask of 0x00 (No unit mask) count 90000
+ */
+               :
+               :/tmp/test_rdtsc/test_rdtsc:     file format elf64-x86-64
+               :
+               :
+               :Disassembly of section .text:
+               :
+0000000000400400 <main>: /* main total: 485476 99.9959 */
+               :    val = (now.tv_sec * 1000000) + now.tv_usec;
+               :#endif
+               :    return val;
+               :}
+               :
+               :int main(void) {
+               :  400400:	push   %rbx
+               :  400401:	mov    $0x5f5e100,%esi
+               :  400406:	nopw   %cs:0x0(%rax,%rax,1)
+               :
+               :uint64_t UtilCpuGetTicks(void) {
+               :    uint64_t val;
+               :#if defined(__GNUC__) && (defined(__x86_64) || defined(_X86_64_) || defined(ia_64) || defined(__i386__))
+               :#if defined(__x86_64) || defined(_X86_64_) || defined(ia_64)
+               :    __asm__ __volatile__ (
+   350  0.0721 :  400410:	xor    %eax,%eax
+               :  400412:	cpuid  
+               :    "cpuid\n\t"
+               :    "popl %%ebx\n\t"
+               :    ::: "%eax", "%ecx", "%edx");
+               :#endif
+               :    uint32_t a, d;
+               :    __asm__ __volatile__ ("rdtsc" : "=a" (a), "=d" (d));
+232560 47.9015 :  400414:	rdtsc  
+               :    val = ((uint64_t)a) | (((uint64_t)d) << 32);
+               :#if defined(__x86_64) || defined(_X86_64_) || defined(ia_64)
+               :    __asm__ __volatile__ (
+ 15608  3.2149 :  400416:	xor    %eax,%eax
+               :  400418:	cpuid  
+               :
+               :int main(void) {
+               :	int i;
+               :	uint64_t v;
+               :
+               :	for (i = 0; i < 100000000; ++i) {
+230347 47.4457 :  40041a:	sub    $0x1,%esi
+  6611  1.3617 :  40041d:	jne    400410 <main+0x10>
+               :		v = UtilCpuGetTicks();
+               :	}
+               :
+               :	return 0;
+               :}
+               :  40041f:	xor    %eax,%eax
+               :  400421:	pop    %rbx
+               :  400422:	retq   
+               :  400423:	nopw   %cs:0x0(%rax,%rax,1)
+               :  40042d:	nopl   (%rax)
