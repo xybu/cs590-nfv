@@ -34,7 +34,11 @@ We updated Suricata to 3.1.2 in VM and redo the experiment on old VM setup. By c
 
 We see that Suricata 3.1.2 uses much less CPU resource and about 30% less RAM than Suricata 3.0.1 (25% vs. 36%).
 
-Graph TBA.
+![Suricata 3.1.2](https://rawgithub.com/xybu/cs590-nfv/master/data/suricata312_vm_4x_cpu_ram.svg)
+
+Recall that Suricata 3.0.1 in VM almost saturated the CPU at 1X bigFlows.pcap load.
+
+![Suricata 3.0.1](https://rawgithub.com/xybu/cs590-nfv/master/data/suricata301_vm_4x_cpu_ram.svg)
 
 # Is `rdtsc` faster in newer version of QEMU?
 
