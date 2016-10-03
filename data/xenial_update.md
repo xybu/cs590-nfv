@@ -73,8 +73,29 @@ gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2)
 
 # VFIO
 
-TBA.
+We see that VFIO in general reduces CPU overhead and the spared resource can be used by application, and the heavier the traffic, the more CPU resource is saved. But VM+VFIO is by no means comparable to any container setup.
+
+Another note is that after VFIO is enabled it seems that KVM no longer dynamically allocates memory for the VM. Behavior-wise for VM+VFIO setup (VM memory is set to 2GB) 2465MB is used after VM boots, while for VM+macvtap setup only 618MB memory is used.
+
+## Impact of VFIO for Snort
+
+Compare the performance of Snort in VM+VFIO with that of VM+macvtap. 
+
+| Load | CPU Usage                | Performance                    | Note                 |
+|------|--------------------------|--------------------------------|----------------------|
+|  2X  | mean=-3.45, stdev=1.4875 | No significant difference.     | bigFlows.pcap        |
+|  4X  | First part {mean=-3.69, stdev=5.27}, second part {mean=-40.03, stdev=12.73} | Drops 8% less packet. | bigFlows.pcap  |
+
+ * Not sure what caused the great difference in the second part of 4X bigFlows.pcap. At 2X load the separation is not obvious.
+ * For snort.log trace file no obvious difference is observed probably because (1) CPU usage is measured at 1 sec interval and doesn't align well, and (2) the duration of the trace file is short.
+
+## Impact of VFIO for Suricata
+
+| Load | CPU Usage                | Performance                    | Note                 |
+|------|--------------------------|--------------------------------|----------------------|
+|  2X  | mean=-3.85, stdev=3.6903 | No difference.                 | bigFlows.pcap        |
+|  4X  | mean=-7.55, stdev=3.4549 | 1% less packet drop.           | bigFlows.pcap        |
 
 # Ubuntu Xenial
 
-TBA.
+For Snort, the impact of latest Ubuntu (16.04.1) and compiler (GCC 5.4) is trivial (< +-1% for all setups).
