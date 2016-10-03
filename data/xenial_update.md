@@ -75,7 +75,7 @@ gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.2)
 
 We see that VFIO in general reduces CPU overhead and the spared resource can be used by application, and the heavier the traffic, the more CPU resource is saved. But VM+VFIO is by no means comparable to any container setup.
 
-Another note is that after VFIO is enabled it seems that KVM no longer dynamically allocates memory for the VM. Behavior-wise for VM+VFIO setup (VM memory is set to 2GB) 2465MB is used after VM boots, while for VM+macvtap setup only 618MB memory is used.
+Another note is that after VFIO is enabled it seems that KVM no longer dynamically allocates memory for the VM. Behavior-wise for VM+VFIO setup (VM memory is set to 2GB) 2465MB of host memory is used after VM boots, while for VM+macvtap setup only 618MB memory is used.
 
 ## Impact of VFIO for Snort
 
