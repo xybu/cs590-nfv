@@ -22,12 +22,12 @@ Behavior-wise we see that Suricata 3.1.x uses by default 4 mgmt threads and 4 pk
 
 ## Suricata 3.1.2
 
-We updated Suricata to 3.1.2 in VM and redo the experiment on old VM setup. By comparing the [new excel sheet](https://github.com/xybu/cs590-nfv/blob/master/data/suricata_v312/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C1%2C2g%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) with the [old excel sheet](https://github.com/xybu/cs590-nfv/blob/master/experiments/suricata/data/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C4%2C1536m%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) we see that Suricata managed to capture more packets and decode most of them.
+We updated Suricata to 3.1.2 in VM and redo the experiment on old VM setup. By comparing the [new excel sheet](https://github.com/xybu/cs590-nfv/blob/master/data/suricata_v312/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C1%2C2g%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) with the [old excel sheet](https://github.com/xybu/cs590-nfv/blob/master/experiments/suricata/data/vm%2CbigFlows.pcap%2C4%2Cem2%2Cenp34s0%2C4%2C2g%2C4%2C0-3%2C5%2Csuricata-vm%2Cdhcp%2Ceth1%2C1%2Ceve.xlsx) we see that Suricata managed to capture more packets and decode most of them.
 
 | Suricata | Total.Sent.Pkts | Captured.Pkts | Drop.Pkts | Decoded.Pkts | Decoded.KB |
 |----------|-----------------|---------------|-----------|--------------|------------|
 |   3.1.2  |   3166460       |    3081408    |   33046   |    3048538   | 1331173.01 |
-|   3.0.1  |   3166460       |    3072487    |  1608286  |    1463885   | 551995.78  |
+|   3.0.1  |   3166460       |    3072473    |  1612954  |    1458653   | 546008.40  |
 
 ## Resource Usage of Suricata
 
