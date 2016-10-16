@@ -14,7 +14,7 @@ Some updates indeed bring performance improvements.
 
 A series of updates of Suricata, namely, [`3.1`](https://suricata-ids.org/2016/06/20/suricata-3-1-released/), [`3.1.1`](https://suricata-ids.org/2016/07/13/suricata-3-1-1-released/), [`3.1.2`](https://suricata-ids.org/2016/09/07/suricata-3-1-2-released/) brought many performance improvements to this software. Some highlights are:
 
-* Use [HyperScan](http://www.intel.com/content/dam/www/public/us/en/documents/solution-briefs/hyperscan-suricata-solution-brief.pdf) as the default pattern matching library (3.1). Intel benchmark reveals huge performance improvement.
+* Use [HyperScan](http://www.intel.com/content/dam/www/public/us/en/documents/solution-briefs/hyperscan-suricata-solution-brief.pdf) as the default pattern matching library (3.1). Intel benchmark reveals huge performance improvement. __Our testbeds, however, do not support AVX/AVX2 instruction sets and can't make full use of HyperScan. Therefore we did not test this factor.__
 * Detection engine is rewritten to improve memory usage, bootstrap time, and performance (3.1).
 * Optimized lock (3.1), TCP and IPv6 decoder (3.1), and AF_PACKET support (3.1, 3.1.1).
 
