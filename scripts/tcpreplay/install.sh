@@ -7,9 +7,9 @@ sudo apt-get install build-essential libpcap-dev nmap
 
 # Download tcpreplay
 cd /tmp
-wget https://github.com/appneta/tcpreplay/releases/download/v4.1.1/tcpreplay-4.1.1.tar.gz
-tar xvf tcpreplay-4.1.1.tar.gz
-cd tcpreplay-4.1.1
+wget https://github.com/appneta/tcpreplay/releases/download/v4.1.1/tcpreplay-4.1.2.tar.gz
+tar xvf tcpreplay-4.1.2.tar.gz
+cd tcpreplay-4.1.2
 
 # Install tcyreplay
 ./configure --enable-tcpreplay-edit --enable-64bits
