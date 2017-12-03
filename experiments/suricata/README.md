@@ -681,7 +681,9 @@ Note that because we are taking medians, cumulative number of packets sent is no
 
 We see from the graph that Suricata packet capturing thread(s) never manages to process packets that come every single second. Most new packets are dropped and few are decoded. CPU usage reaches ceiling near second 10 and remains high for a few seconds. My guess is that because Suricata can't read packets fast enough, the kernel buffer to hold packets becomes full and new packets are simply dropped. When Suricata catches up it no longer finds more packets to process.
 
-No matter what the reason is, this test confirms again the severe performance degradation of Suricata inside VM setup.
+After further checking, it turns out the the performance degradation is largely due to the fact that X86 `rdtsc` instruction cannot
+run efficiently in VM environment. It's mostly used to get precise timestamps for profiling purposes. Turning down rate of
+profiling could mitigate the issue, but cannot solve it.
 
 ## Conclusion
 
